@@ -17,12 +17,36 @@ import {
   ResponsiveContainer,
   ScatterChart,
   Scatter,
-  RadialBarChart,
-  RadialBar,
   ComposedChart
 } from 'recharts';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip as ChartTooltip,
+  Legend as ChartLegend,
+  Filler
+} from 'chart.js';
+import { Line as ChartJSLine, Bar as ChartJSBar, Scatter as ChartJSScatter } from 'react-chartjs-2';
 import { Calendar, TrendingUp, DollarSign, Users, Filter, Download, RefreshCw } from 'lucide-react';
 import { apiService } from '../services/api';
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  ChartTooltip,
+  ChartLegend,
+  Filler
+);
 
 interface AnalyticsData {
   monthlyTrends: any[];
@@ -108,6 +132,53 @@ const Analytics: React.FC = () => {
     return null;
   };
 
+  // Chart.js configurations
+  const chartJSOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: '#9CA3AF',
+          font: {
+            size: 12
+          }
+        }
+      },
+      tooltip: {
+        backgroundColor: '#1F2937',
+        titleColor: '#F3F4F6',
+        bodyColor: '#F3F4F6',
+        borderColor: '#374151',
+        borderWidth: 1
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: '#9CA3AF',
+          font: {
+            size: 11
+          }
+        },
+        grid: {
+          color: '#374151'
+        }
+      },
+      y: {
+        ticks: {
+          color: '#9CA3AF',
+          font: {
+            size: 11
+          }
+        },
+        grid: {
+          color: '#374151'
+        }
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -143,6 +214,84 @@ const Analytics: React.FC = () => {
       </div>
     );
   }
+
+  // Prepare data for Chart.js charts
+  const scatterData = {
+    datasets: [
+      {
+        label: 'Revenue vs Profit Margin',
+        data: analyticsData.performanceMetrics.map(item => ({
+          x: item.revenue,
+          y: item.profitMargin
+        })),
+        backgroundColor: 'rgba(16, 185, 129, 0.6)',
+        borderColor: 'rgba(16, 185, 129, 1)',
+        pointRadius: 6,
+        pointHoverRadius: 8
+      }
+    ]
+  };
+
+  const floatingBarData = {
+    labels: analyticsData.monthlyTrends.map(item => item.month),
+    datasets: [
+      {
+        label: 'Revenue Range',
+        data: analyticsData.monthlyTrends.map(item => [0, item.revenue]),
+        backgroundColor: 'rgba(16, 185, 129, 0.7)',
+        borderColor: 'rgba(16, 185, 129, 1)',
+        borderWidth: 2,
+        borderRadius: 4
+      },
+      {
+        label: 'Expense Range',
+        data: analyticsData.monthlyTrends.map(item => [0, item.expense]),
+        backgroundColor: 'rgba(239, 68, 68, 0.7)',
+        borderColor: 'rgba(239, 68, 68, 1)',
+        borderWidth: 2,
+        borderRadius: 4
+      }
+    ]
+  };
+
+  const lineChartData = {
+    labels: analyticsData.timeSeriesData.slice(-30).map(item => 
+      new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    ),
+    datasets: [
+      {
+        label: 'Daily Revenue',
+        data: analyticsData.timeSeriesData.slice(-30).map(item => item.revenue),
+        borderColor: 'rgba(16, 185, 129, 1)',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 3,
+        pointHoverRadius: 6
+      },
+      {
+        label: 'Daily Expenses',
+        data: analyticsData.timeSeriesData.slice(-30).map(item => item.expenses),
+        borderColor: 'rgba(239, 68, 68, 1)',
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 3,
+        pointHoverRadius: 6
+      },
+      {
+        label: 'Net Profit',
+        data: analyticsData.timeSeriesData.slice(-30).map(item => item.net),
+        borderColor: 'rgba(59, 130, 246, 1)',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        fill: false,
+        tension: 0.4,
+        pointRadius: 4,
+        pointHoverRadius: 7,
+        borderWidth: 3
+      }
+    ]
+  };
 
   return (
     <div className="space-y-6">
@@ -245,6 +394,130 @@ const Analytics: React.FC = () => {
         </div>
       )}
 
+      {/* New Chart.js Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Scatter Plot - Revenue vs Profit Margin */}
+        {analyticsData.performanceMetrics.length > 0 && (
+          <div className="bg-gray-800 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-white mb-4">Revenue vs Profit Margin Analysis</h3>
+            <div className="h-80">
+              <ChartJSScatter 
+                data={scatterData} 
+                options={{
+                  ...chartJSOptions,
+                  scales: {
+                    ...chartJSOptions.scales,
+                    x: {
+                      ...chartJSOptions.scales.x,
+                      title: {
+                        display: true,
+                        text: 'Revenue ($)',
+                        color: '#9CA3AF'
+                      },
+                      ticks: {
+                        ...chartJSOptions.scales.x.ticks,
+                        callback: function(value: any) {
+                          return '$' + value.toLocaleString();
+                        }
+                      }
+                    },
+                    y: {
+                      ...chartJSOptions.scales.y,
+                      title: {
+                        display: true,
+                        text: 'Profit Margin (%)',
+                        color: '#9CA3AF'
+                      },
+                      ticks: {
+                        ...chartJSOptions.scales.y.ticks,
+                        callback: function(value: any) {
+                          return value + '%';
+                        }
+                      }
+                    }
+                  }
+                }} 
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Floating Bar Chart - Revenue and Expense Ranges */}
+        {analyticsData.monthlyTrends.length > 0 && (
+          <div className="bg-gray-800 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-white mb-4">Monthly Financial Ranges</h3>
+            <div className="h-80">
+              <ChartJSBar 
+                data={floatingBarData} 
+                options={{
+                  ...chartJSOptions,
+                  indexAxis: 'x' as const,
+                  scales: {
+                    ...chartJSOptions.scales,
+                    y: {
+                      ...chartJSOptions.scales.y,
+                      title: {
+                        display: true,
+                        text: 'Amount ($)',
+                        color: '#9CA3AF'
+                      },
+                      ticks: {
+                        ...chartJSOptions.scales.y.ticks,
+                        callback: function(value: any) {
+                          return '$' + value.toLocaleString();
+                        }
+                      }
+                    }
+                  }
+                }} 
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Chart.js Line Chart - Daily Trends */}
+      {analyticsData.timeSeriesData.length > 0 && (
+        <div className="bg-gray-800 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-white mb-4">Daily Financial Trends (Last 30 Days)</h3>
+          <div className="h-80">
+            <ChartJSLine 
+              data={lineChartData} 
+              options={{
+                ...chartJSOptions,
+                interaction: {
+                  mode: 'index' as const,
+                  intersect: false,
+                },
+                scales: {
+                  ...chartJSOptions.scales,
+                  y: {
+                    ...chartJSOptions.scales.y,
+                    title: {
+                      display: true,
+                      text: 'Amount ($)',
+                      color: '#9CA3AF'
+                    },
+                    ticks: {
+                      ...chartJSOptions.scales.y.ticks,
+                      callback: function(value: any) {
+                        return '$' + value.toLocaleString();
+                      }
+                    }
+                  }
+                },
+                elements: {
+                  point: {
+                    radius: 3,
+                    hoverRadius: 6
+                  }
+                }
+              }} 
+            />
+          </div>
+        </div>
+      )}
+
       {/* Category Breakdown and Status Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Category Breakdown Pie Chart */}
@@ -275,50 +548,6 @@ const Analytics: React.FC = () => {
           </div>
         )}
 
-        {/* Status Distribution */}
-        {analyticsData.statusDistribution.length > 0 && (
-          <div className="bg-gray-800 rounded-xl p-6">
-            <h3 className="text-xl font-bold text-white mb-4">Transaction Status Distribution</h3>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <RadialBarChart cx="50%" cy="50%" innerRadius="20%" outerRadius="90%" data={analyticsData.statusDistribution}>
-                  <RadialBar
-                    minAngle={15}
-                    label={{ position: 'insideStart', fill: '#fff' }}
-                    background
-                    clockWise
-                    dataKey="percentage"
-                    fill="#10B981"
-                  />
-                  <Legend iconSize={18} layout="vertical" verticalAlign="middle" align="right" />
-                  <Tooltip content={<CustomTooltip />} />
-                </RadialBarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* User Activity and Amount Distribution */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Top Users by Activity */}
-        {analyticsData.userActivity.length > 0 && (
-          <div className="bg-gray-800 rounded-xl p-6">
-            <h3 className="text-xl font-bold text-white mb-4">Top Users by Transaction Volume</h3>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={analyticsData.userActivity.slice(0, 8)} layout="horizontal">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis type="number" stroke="#9CA3AF" fontSize={12} tickFormatter={(value) => `$${value}`} />
-                  <YAxis dataKey="user" type="category" stroke="#9CA3AF" fontSize={12} width={100} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="totalAmount" fill="#10B981" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        )}
-
         {/* Amount Distribution */}
         {analyticsData.amountDistribution.length > 0 && (
           <div className="bg-gray-800 rounded-xl p-6">
@@ -337,48 +566,6 @@ const Analytics: React.FC = () => {
           </div>
         )}
       </div>
-
-      {/* Time Series Analysis */}
-      {analyticsData.timeSeriesData.length > 0 && (
-        <div className="bg-gray-800 rounded-xl p-6">
-          <h3 className="text-xl font-bold text-white mb-4">Daily Transaction Activity</h3>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={analyticsData.timeSeriesData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis 
-                  dataKey="date" 
-                  stroke="#9CA3AF" 
-                  fontSize={12}
-                  tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                />
-                <YAxis stroke="#9CA3AF" fontSize={12} />
-                <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="amount" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.6} />
-                <Area type="monotone" dataKey="count" stroke="#F97316" fill="#F97316" fillOpacity={0.4} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      )}
-
-      {/* Performance Metrics */}
-      {analyticsData.performanceMetrics.length > 0 && (
-        <div className="bg-gray-800 rounded-xl p-6">
-          <h3 className="text-xl font-bold text-white mb-4">Performance Efficiency</h3>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <ScatterChart data={analyticsData.performanceMetrics}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="revenue" stroke="#9CA3AF" fontSize={12} tickFormatter={(value) => `$${value}`} />
-                <YAxis dataKey="profitMargin" stroke="#9CA3AF" fontSize={12} tickFormatter={(value) => `${value}%`} />
-                <Tooltip content={<CustomTooltip />} />
-                <Scatter dataKey="profit" fill="#10B981" />
-              </ScatterChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      )}
 
       {/* Data Summary */}
       <div className="bg-gray-800 rounded-xl p-6">
