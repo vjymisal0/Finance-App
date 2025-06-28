@@ -19,7 +19,7 @@ const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchChange }) => {
   };
 
   return (
-    <div className="bg-gray-800 border-b border-gray-700 px-8 py-4 ml-64 fixed top-0 right-0 left-64 z-30">
+    <div className="bg-gray-800 border-b border-gray-700 px-6 py-3 ml-64 top-0 right-0 left-64 z-30">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white">Dashboard</h1>
         

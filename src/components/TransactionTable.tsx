@@ -12,9 +12,9 @@ interface TransactionTableProps {
 type SortField = 'date' | 'amount' | 'name' | 'status';
 type SortDirection = 'asc' | 'desc';
 
-const TransactionTable: React.FC<TransactionTableProps> = ({ 
-  onAddAlert, 
-  fullView = false 
+const TransactionTable: React.FC<TransactionTableProps> = ({
+  onAddAlert,
+  fullView = false
 }) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,7 +78,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   // Sort transactions locally
   const sortedTransactions = [...transactions].sort((a, b) => {
     let aValue, bValue;
-    
+
     switch (sortField) {
       case 'date':
         aValue = new Date(a.date).getTime();
@@ -99,7 +99,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       default:
         return 0;
     }
-    
+
     if (sortDirection === 'asc') {
       return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
     } else {
@@ -117,7 +117,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       currency: 'USD',
       minimumFractionDigits: 2,
     }).format(Math.abs(amount));
-    
+
     return amount >= 0 ? `+${formatted}` : `-${formatted}`;
   };
 
@@ -133,12 +133,10 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   const getStatusBadge = (status: string) => {
     const baseClasses = "px-3 py-1 rounded-full text-xs font-medium";
     switch (status.toLowerCase()) {
-      case 'completed':
+      case 'paid':
         return `${baseClasses} bg-green-500/20 text-green-500`;
       case 'pending':
         return `${baseClasses} bg-yellow-500/20 text-yellow-500`;
-      case 'failed':
-        return `${baseClasses} bg-red-500/20 text-red-500`;
       default:
         return `${baseClasses} bg-gray-500/20 text-gray-500`;
     }
@@ -146,8 +144,8 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
 
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) return null;
-    return sortDirection === 'asc' ? 
-      <ChevronUp className="w-4 h-4 ml-1" /> : 
+    return sortDirection === 'asc' ?
+      <ChevronUp className="w-4 h-4 ml-1" /> :
       <ChevronDown className="w-4 h-4 ml-1" />;
   };
 
@@ -160,7 +158,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
         <h3 className="text-xl font-bold text-white">
           {fullView ? 'All Transactions' : 'Transactions'}
         </h3>
-        
+
         <div className="flex items-center space-x-4">
           {/* Search */}
           <div className="relative">
@@ -173,11 +171,11 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
               className="bg-gray-700 text-white placeholder-gray-400 pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 w-64"
             />
           </div>
-          
+
           {/* Date Filter */}
           <div className="flex items-center space-x-2 bg-gray-700 px-4 py-2 rounded-lg">
             <Calendar className="w-4 h-4 text-gray-400" />
-            <select 
+            <select
               value={filters.dateRange}
               onChange={(e) => setFilters({
                 ...filters,
@@ -191,7 +189,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
               <option value="90days">Last 90 Days</option>
             </select>
           </div>
-          
+
           {/* Filter Button */}
           <button
             onClick={() => setShowFilters(!showFilters)}
@@ -200,7 +198,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             <Filter className="w-4 h-4" />
             <span>Filter</span>
           </button>
-          
+
           {/* Export Button */}
           <button
             onClick={() => setShowExportModal(true)}
@@ -226,13 +224,12 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
               className="w-full bg-gray-600 text-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
             >
               <option value="all">All Status</option>
-              <option value="completed">Completed</option>
+              <option value="paid">Paid</option>
               <option value="pending">Pending</option>
-              <option value="failed">Failed</option>
             </select>
           </div>
-          
-          <div>
+
+          {/* <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Type</label>
             <select
               value={filters.type}
@@ -246,8 +243,8 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
               <option value="income">Income</option>
               <option value="expense">Expense</option>
             </select>
-          </div>
-          
+          </div> */}
+
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
             <select
@@ -259,14 +256,11 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
               className="w-full bg-gray-600 text-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
             >
               <option value="all">All Categories</option>
-              <option value="freelance">Freelance</option>
-              <option value="salary">Salary</option>
-              <option value="shopping">Shopping</option>
-              <option value="utilities">Utilities</option>
-              <option value="coffee">Coffee</option>
+                           <option value="revenue">Revenue</option>
+              <option value="expense">Expense</option>
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Amount Range</label>
             <div className="flex space-x-2">
@@ -313,7 +307,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-700">
-                  <th 
+                  <th
                     className="text-left text-gray-400 font-medium pb-4 cursor-pointer hover:text-white transition-colors"
                     onClick={() => handleSort('name')}
                   >
@@ -322,7 +316,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                       <SortIcon field="name" />
                     </div>
                   </th>
-                  <th 
+                  <th
                     className="text-left text-gray-400 font-medium pb-4 cursor-pointer hover:text-white transition-colors"
                     onClick={() => handleSort('date')}
                   >
@@ -331,7 +325,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                       <SortIcon field="date" />
                     </div>
                   </th>
-                  <th 
+                  <th
                     className="text-left text-gray-400 font-medium pb-4 cursor-pointer hover:text-white transition-colors"
                     onClick={() => handleSort('amount')}
                   >
@@ -340,7 +334,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                       <SortIcon field="amount" />
                     </div>
                   </th>
-                  <th 
+                  <th
                     className="text-left text-gray-400 font-medium pb-4 cursor-pointer hover:text-white transition-colors"
                     onClick={() => handleSort('status')}
                   >
@@ -353,14 +347,14 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
               </thead>
               <tbody>
                 {sortedTransactions.map((transaction) => (
-                  <tr 
-                    key={transaction.id} 
+                  <tr
+                    key={transaction.id}
                     className="border-b border-gray-700 hover:bg-gray-750 transition-colors"
                   >
                     <td className="py-4">
                       <div className="flex items-center">
-                        <img 
-                          src={transaction.avatar} 
+                        <img
+                          src={transaction.avatar}
                           alt={transaction.name}
                           className="w-10 h-10 rounded-full mr-3 object-cover"
                         />
@@ -374,9 +368,8 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                       {formatDate(transaction.date)}
                     </td>
                     <td className="py-4">
-                      <span className={`font-semibold ${
-                        transaction.amount >= 0 ? 'text-green-500' : 'text-orange-500'
-                      }`}>
+                      <span className={`font-semibold ${transaction.amount >= 0 ? 'text-green-500' : 'text-orange-500'
+                        }`}>
                         {formatAmount(transaction.amount)}
                       </span>
                     </td>

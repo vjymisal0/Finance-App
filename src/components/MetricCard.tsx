@@ -20,45 +20,45 @@ const MetricCard: React.FC<MetricCardProps> = ({ metric, highlighted = false }) 
   const getIcon = (iconName: string) => {
     switch (iconName) {
       case 'Wallet':
-        return <Wallet className="w-6 h-6" />;
+        return <Wallet className="w-5 h-5" />;
       case 'TrendingUp':
-        return <TrendingUp className="w-6 h-6" />;
+        return <TrendingUp className="w-5 h-5" />;
       case 'CreditCard':
-        return <CreditCard className="w-6 h-6" />;
+        return <CreditCard className="w-5 h-5" />;
       case 'PiggyBank':
-        return <PiggyBank className="w-6 h-6" />;
+        return <PiggyBank className="w-5 h-5" />;
       default:
-        return <Wallet className="w-6 h-6" />;
+        return <Wallet className="w-5 h-5" />;
     }
   };
 
   return (
-    <div className={`bg-gray-800 rounded-xl p-6 transition-all duration-300 hover:bg-gray-750 ${
-      highlighted ? 'ring-2 ring-green-500' : ''
+    <div className={`bg-gray-800 rounded-lg p-3 transition-all duration-200 hover:bg-gray-750 ${
+      highlighted ? '' : ''
     }`}>
-      <div className="flex items-center justify-between mb-4">
-        <div className="text-gray-400 text-sm font-medium">{metric.title}</div>
+      <div className="flex items-center justify-between mb-2">
+        <div className="text-gray-400 text-xs font-medium uppercase tracking-wide">{metric.title}</div>
         <div className="text-green-500">
           {getIcon(metric.icon)}
         </div>
       </div>
       
-      <div className="text-3xl font-bold text-white mb-2">
+      <div className="text-xl font-bold text-white mb-1">
         {formatAmount(metric.amount)}
       </div>
       
       <div className="flex items-center">
         {metric.changeType === 'increase' ? (
-          <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
+          <TrendingUp className="w-3 h-3 text-green-500 mr-1" />
         ) : (
-          <TrendingDown className="w-4 h-4 text-red-500 mr-1" />
+          <TrendingDown className="w-3 h-3 text-red-500 mr-1" />
         )}
-        <span className={`text-sm font-medium ${
+        <span className={`text-xs font-medium ${
           metric.changeType === 'increase' ? 'text-green-500' : 'text-red-500'
         }`}>
           {metric.change > 0 ? '+' : ''}{metric.change}%
         </span>
-        <span className="text-gray-400 text-sm ml-1">from last month</span>
+        <span className="text-gray-500 text-xs ml-1">vs last month</span>
       </div>
     </div>
   );

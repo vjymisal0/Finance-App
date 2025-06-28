@@ -19,17 +19,17 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({ transactions })
   const recentTransactions = transactions.slice(0, 3);
 
   return (
-    <div className="bg-gray-800 rounded-xl p-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="bg-gray-800 rounded-xl p-4">
+      <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl font-bold text-white">Recent Transaction</h3>
         <button className="text-green-500 text-sm font-medium hover:text-green-400 transition-colors">
           See all
         </button>
       </div>
       
-      <div className="space-y-4">
+      <div className="space-y-3">
         {recentTransactions.map((transaction) => (
-          <div key={transaction.id} className="flex items-center justify-between p-3 hover:bg-gray-700 rounded-lg transition-colors">
+          <div key={transaction.id} className="flex items-center justify-between p-2 hover:bg-gray-700 rounded-lg transition-colors">
             <div className="flex items-center">
               <img 
                 src={transaction.avatar} 

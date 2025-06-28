@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
 import { ChartData } from '../types';
 
@@ -7,7 +7,6 @@ interface ChartProps {
 }
 
 const Chart: React.FC<ChartProps> = ({ data }) => {
-  const [activeView, setActiveView] = useState<'income' | 'expenses'>('income');
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -26,8 +25,8 @@ const Chart: React.FC<ChartProps> = ({ data }) => {
   };
 
   return (
-    <div className="bg-gray-800 rounded-xl p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-gray-800 rounded-xl p-4">
+      <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl font-bold text-white">Overview</h3>
         
         <div className="flex items-center space-x-4">
@@ -50,7 +49,7 @@ const Chart: React.FC<ChartProps> = ({ data }) => {
         </div>
       </div>
       
-      <div className="h-80">
+      <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -85,9 +84,9 @@ const Chart: React.FC<ChartProps> = ({ data }) => {
         </ResponsiveContainer>
       </div>
       
-      <div className="mt-4 p-4 bg-gray-700 rounded-lg">
-        <div className="text-green-500 text-2xl font-bold">$224.00</div>
-        <div className="text-gray-400 text-sm">Current month highlight</div>
+      <div className="mt-3 p-3 bg-gray-700 rounded-lg">
+        <div className="text-green-500 text-xl font-bold">$224.00</div>
+        <div className="text-gray-400 text-xs">Current month highlight</div>
       </div>
     </div>
   );

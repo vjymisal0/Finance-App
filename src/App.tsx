@@ -70,9 +70,9 @@ function DashboardContent() {
     }
 
     return (
-      <div className="space-y-8">
+      <div className="space-y-6">
         {/* Metrics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {dashboardData.metrics.map((metric: any, index: number) => (
             <MetricCard 
               key={metric.title} 
@@ -83,7 +83,7 @@ function DashboardContent() {
         </div>
 
         {/* Chart and Recent Transactions */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <Chart data={dashboardData.chartData} />
           </div>
@@ -150,7 +150,7 @@ function DashboardContent() {
       <AlertSystem alerts={alerts} onRemoveAlert={removeAlert} />
       
       {/* Main Content */}
-      <div className="ml-64 pt-20 p-8">
+      <div className="ml-64 pt-5 px-6 py-4">
         {renderContent()}
       </div>
     </div>

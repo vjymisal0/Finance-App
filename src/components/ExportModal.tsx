@@ -11,7 +11,7 @@ interface ExportModalProps {
 
 const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, onExport }) => {
   const [config, setConfig] = useState<ExportConfig>({
-    columns: ['name', 'email', 'date', 'amount', 'status', 'type', 'category'],
+    columns: ['name', 'email', 'date', 'amount', 'status', 'category'],
     dateRange: {
       start: '',
       end: ''
@@ -35,7 +35,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, onExport }) 
     { key: 'date', label: 'Date' },
     { key: 'amount', label: 'Amount' },
     { key: 'status', label: 'Status' },
-    { key: 'type', label: 'Type' },
     { key: 'category', label: 'Category' },
     { key: 'description', label: 'Description' }
   ];
@@ -168,25 +167,24 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, onExport }) 
                   className="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   <option value="all">All Status</option>
-                  <option value="completed">Completed</option>
+                  <option value="paid">Paid</option>
                   <option value="pending">Pending</option>
-                  <option value="failed">Failed</option>
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Type
+                  Category
                 </label>
                 <select
-                  value={config.filters.type}
+                  value={config.filters.category}
                   onChange={(e) => setConfig(prev => ({
                     ...prev,
-                    filters: { ...prev.filters, type: e.target.value as any }
+                    filters: { ...prev.filters, category: e.target.value as any }
                   }))}
                   className="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
-                  <option value="all">All Types</option>
-                  <option value="income">Income</option>
+                  <option value="all">All Categories</option>
+                  <option value="revenue">Revenue</option>
                   <option value="expense">Expense</option>
                 </select>
               </div>
