@@ -9,6 +9,7 @@ import Chart from './components/Chart';
 import RecentTransactions from './components/RecentTransactions';
 import TransactionTable from './components/TransactionTable';
 import AlertSystem from './components/AlertSystem';
+import Analytics from './components/Analytics';
 import { apiService } from './services/api';
 import { Transaction, Alert } from './types';
 
@@ -111,24 +112,25 @@ function DashboardContent() {
     </div>
   );
 
+  const renderAnalytics = () => (
+    <div>
+      <Analytics />
+    </div>
+  );
+
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
         return renderDashboard();
       case 'transactions':
         return renderTransactions();
+      case 'analytics':
+        return renderAnalytics();
       case 'wallet':
         return (
           <div className="bg-gray-800 rounded-xl p-8 text-center">
             <h2 className="text-2xl font-bold text-white mb-4">Wallet</h2>
             <p className="text-gray-400">Wallet functionality coming soon...</p>
-          </div>
-        );
-      case 'analytics':
-        return (
-          <div className="bg-gray-800 rounded-xl p-8 text-center">
-            <h2 className="text-2xl font-bold text-white mb-4">Analytics</h2>
-            <p className="text-gray-400">Advanced analytics coming soon...</p>
           </div>
         );
       default:
