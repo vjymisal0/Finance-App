@@ -230,10 +230,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - � [GitHub Issues](https://github.com/vjymisal0/Finance-App/issues)
 - 📚 [Additional Resources](https://gist.github.com/vjymisal0/32ad84db560ffd2c4a07783358ba9b93)
 
-**Useful Links:**
-- Frontend: http://localhost:5173
-- Backend: http://localhost:3001
-- Health Check: http://localhost:3001/api/health
+**Deployed Link:**
+- Frontend: https://financeapp-fullstack.netlify.app/
+
 
 ---
 
