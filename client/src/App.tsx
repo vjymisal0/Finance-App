@@ -75,10 +75,10 @@ function DashboardContent() {
         {/* Metrics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {dashboardData.metrics.map((metric: any, index: number) => (
-            <MetricCard
-              key={metric.title}
-              metric={metric}
-              highlighted={index === 3}
+            <MetricCard 
+              key={metric.title} 
+              metric={metric} 
+              highlighted={index === 3} 
             />
           ))}
         </div>
@@ -95,7 +95,7 @@ function DashboardContent() {
 
         {/* Transactions Table */}
         <div>
-          <TransactionTable
+          <TransactionTable 
             onAddAlert={addAlert}
           />
         </div>
@@ -105,7 +105,7 @@ function DashboardContent() {
 
   const renderTransactions = () => (
     <div>
-      <TransactionTable
+      <TransactionTable 
         onAddAlert={addAlert}
         fullView={true}
       />
@@ -147,10 +147,10 @@ function DashboardContent() {
     <div className="min-h-screen bg-gray-900">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-
+      
       {/* Alert System */}
       <AlertSystem alerts={alerts} onRemoveAlert={removeAlert} />
-
+      
       {/* Main Content */}
       <div className="ml-64 pt-5 px-6 py-4">
         {renderContent()}
