@@ -155,6 +155,29 @@ class ApiService {
       throw new Error(error.response?.data?.message || 'Failed to fetch dashboard data');
     }
   }
+
+  // Analytics endpoints
+  async getAnalyticsData(period: string = '6months', startDate?: string, endDate?: string): Promise<ApiResponse<any>> {
+    try {
+      const params = new URLSearchParams({ period });
+      if (startDate) params.append('startDate', startDate);
+      if (endDate) params.append('endDate', endDate);
+
+      const response = await this.api.get(`/analytics?${params.toString()}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch analytics data');
+    }
+  }
+
+  async getAnalyticsSummary(period: string = '1year'): Promise<ApiResponse<any>> {
+    try {
+      const response = await this.api.get(`/analytics/summary?period=${period}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch analytics summary');
+    }
+  }
 }
 
 export const apiService = new ApiService();

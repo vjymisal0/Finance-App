@@ -131,6 +131,25 @@ http://localhost:3000/api/v1
 
 ---
 
+
+## 🚀 Live Demo & Resources
+
+### 🌐 **Deployed Application**
+- **Frontend**: [Live Demo Link - Coming Soon](#)
+- **Backend API**: [API Endpoint - Coming Soon](#)
+
+### 📋 **Documentation & Collections**
+- **Postman Collection**: [Import Collection Link - Coming Soon](#)
+- **API Documentation**: [Detailed API Docs - Coming Soon](#)
+- **Code Repository**: [GitHub Gist Link - Coming Soon](#)
+
+### 🔗 **Quick Links**
+- **Demo Credentials**: `admin@example.com` / `password`
+- **Health Check**: `GET /api/health`
+- **API Base URL**: `http://localhost:3001/api`
+
+---
+
 ## Contributing
 
 1. Fork the repository

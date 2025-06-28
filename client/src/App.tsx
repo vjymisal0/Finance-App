@@ -9,6 +9,7 @@ import Chart from './components/Chart';
 import RecentTransactions from './components/RecentTransactions';
 import TransactionTable from './components/TransactionTable';
 import AlertSystem from './components/AlertSystem';
+import Analytics from './components/Analytics';
 import { apiService } from './services/api';
 import { Transaction, Alert } from './types';
 
@@ -74,10 +75,10 @@ function DashboardContent() {
         {/* Metrics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {dashboardData.metrics.map((metric: any, index: number) => (
-            <MetricCard 
-              key={metric.title} 
-              metric={metric} 
-              highlighted={index === 3} 
+            <MetricCard
+              key={metric.title}
+              metric={metric}
+              highlighted={index === 3}
             />
           ))}
         </div>
@@ -94,7 +95,7 @@ function DashboardContent() {
 
         {/* Transactions Table */}
         <div>
-          <TransactionTable 
+          <TransactionTable
             onAddAlert={addAlert}
           />
         </div>
@@ -104,10 +105,16 @@ function DashboardContent() {
 
   const renderTransactions = () => (
     <div>
-      <TransactionTable 
+      <TransactionTable
         onAddAlert={addAlert}
         fullView={true}
       />
+    </div>
+  );
+
+  const renderAnalytics = () => (
+    <div>
+      <Analytics />
     </div>
   );
 
@@ -117,18 +124,13 @@ function DashboardContent() {
         return renderDashboard();
       case 'transactions':
         return renderTransactions();
+      case 'analytics':
+        return renderAnalytics();
       case 'wallet':
         return (
           <div className="bg-gray-800 rounded-xl p-8 text-center">
             <h2 className="text-2xl font-bold text-white mb-4">Wallet</h2>
             <p className="text-gray-400">Wallet functionality coming soon...</p>
-          </div>
-        );
-      case 'analytics':
-        return (
-          <div className="bg-gray-800 rounded-xl p-8 text-center">
-            <h2 className="text-2xl font-bold text-white mb-4">Analytics</h2>
-            <p className="text-gray-400">Advanced analytics coming soon...</p>
           </div>
         );
       default:
@@ -145,10 +147,10 @@ function DashboardContent() {
     <div className="min-h-screen bg-gray-900">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-      
+
       {/* Alert System */}
       <AlertSystem alerts={alerts} onRemoveAlert={removeAlert} />
-      
+
       {/* Main Content */}
       <div className="ml-64 pt-5 px-6 py-4">
         {renderContent()}
