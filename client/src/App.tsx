@@ -74,9 +74,6 @@ function DashboardContent() {
         matchingSection.ref.current.style.transform = 'scale(1.02)';
         matchingSection.ref.current.style.transition = 'transform 0.3s ease';
 
-        // Show success alert
-        addAlert('info', `Scrolled to ${matchingSection.name}`);
-
         // Remove highlight after animation
         setTimeout(() => {
           if (matchingSection.ref.current) {
@@ -101,6 +98,12 @@ function DashboardContent() {
   // Remove alert function
   const removeAlert = (id: string) => {
     setAlerts(prev => prev.filter(alert => alert.id !== id));
+  };
+
+  // Handle view all transactions
+  const handleViewAllTransactions = () => {
+    setActiveTab('transactions');
+    addAlert('info', 'Navigated to All Transactions');
   };
 
   // Fetch dashboard data
@@ -159,11 +162,7 @@ function DashboardContent() {
               <p className="text-gray-400">
                 Here's what's happening with your finances today.
               </p>
-              {searchQuery && activeTab === 'dashboard' && (
-                <p className="text-green-400 text-sm mt-2">
-                  💡 Try searching for: "metrics", "chart", "recent transactions", or "transactions"
-                </p>
-              )}
+
             </div>
             <div className="mt-4 sm:mt-0 flex items-center space-x-4">
               <div className="text-right">
@@ -199,7 +198,10 @@ function DashboardContent() {
             <Chart data={dashboardData.chartData} />
           </div>
           <div ref={recentTransactionsRef}>
-            <RecentTransactions transactions={dashboardData.recentTransactions} />
+            <RecentTransactions
+              transactions={dashboardData.recentTransactions}
+              onViewAllTransactions={handleViewAllTransactions}
+            />
           </div>
         </div>
 

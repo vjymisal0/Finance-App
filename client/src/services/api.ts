@@ -1,9 +1,13 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ApiResponse, Transaction, User, LoginCredentials, RegisterCredentials, FilterOptions, ExportConfig } from '../types';
+import { config, validateEnvironment } from '../config/environment';
+
+// Validate environment on module load
+validateEnvironment();
 
 class ApiService {
   private api: AxiosInstance;
-  private baseURL = 'http://localhost:3001/api';
+  private baseURL = config.API_BASE_URL;
 
   constructor() {
     this.api = axios.create({
@@ -35,9 +39,37 @@ class ApiService {
           localStorage.removeItem('user_data');
           // Don't redirect automatically, let the auth context handle it
         }
+        
+        // Enhanced error logging for development
+        if (config.IS_DEVELOPMENT) {
+          console.error('API Error:', {
+            url: error.config?.url,
+            method: error.config?.method,
+            status: error.response?.status,
+            message: error.response?.data?.message || error.message,
+            baseURL: this.baseURL
+          });
+        }
+        
         return Promise.reject(error);
       }
     );
+
+    // Log API configuration in development
+    if (config.IS_DEVELOPMENT) {
+      console.log('🔧 API Service initialized with base URL:', this.baseURL);
+    }
+  }
+
+  // Health check method to verify API connectivity
+  async healthCheck(): Promise<boolean> {
+    try {
+      const response = await this.api.get('/health');
+      return response.status === 200;
+    } catch (error) {
+      console.error('❌ API Health check failed:', error);
+      return false;
+    }
   }
 
   // Authentication endpoints
@@ -177,6 +209,20 @@ class ApiService {
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch analytics summary');
     }
+  }
+
+  // Get current configuration
+  getConfig() {
+    return {
+      baseURL: this.baseURL,
+      environment: config.NODE_ENV,
+      version: config.APP_VERSION,
+      features: {
+        analytics: config.ENABLE_ANALYTICS,
+        notifications: config.ENABLE_NOTIFICATIONS,
+        export: config.ENABLE_EXPORT
+      }
+    };
   }
 }
 
