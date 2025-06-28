@@ -77,15 +77,31 @@ const Analytics: React.FC = () => {
       return (
         <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 shadow-lg">
           <p className="text-gray-300 text-sm mb-2">{label}</p>
-          {payload.map((entry: any, index: number) => (
-            <p key={index} className="text-white font-semibold" style={{ color: entry.color }}>
-              {entry.name}: {typeof entry.value === 'number' ? 
-                (entry.name.toLowerCase().includes('amount') || entry.name.toLowerCase().includes('revenue') || entry.name.toLowerCase().includes('expense') || entry.name.toLowerCase().includes('profit') ? 
-                  `$${entry.value.toLocaleString()}` : 
-                  entry.value.toLocaleString()
-                ) : entry.value}
-            </p>
-          ))}
+          {payload.map((entry: any, index: number) => {
+            const entryName = entry.name || entry.dataKey || 'Value';
+            const entryValue = entry.value;
+            
+            // Check if this is a monetary value
+            const isMonetary = typeof entryName === 'string' && (
+              entryName.toLowerCase().includes('amount') || 
+              entryName.toLowerCase().includes('revenue') || 
+              entryName.toLowerCase().includes('expense') || 
+              entryName.toLowerCase().includes('profit') ||
+              entryName.toLowerCase().includes('net') ||
+              entryName === 'totalAmount' ||
+              entryName === 'avgAmount'
+            );
+            
+            const formattedValue = typeof entryValue === 'number' ? 
+              (isMonetary ? `$${entryValue.toLocaleString()}` : entryValue.toLocaleString()) : 
+              entryValue;
+            
+            return (
+              <p key={index} className="text-white font-semibold" style={{ color: entry.color }}>
+                {entryName}: {formattedValue}
+              </p>
+            );
+          })}
         </div>
       );
     }
