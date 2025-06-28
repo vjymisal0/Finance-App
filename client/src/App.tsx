@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AuthPage from './components/auth/AuthPage';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -19,6 +19,73 @@ function DashboardContent() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  // Refs for dashboard sections
+  const metricsRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<HTMLDivElement>(null);
+  const recentTransactionsRef = useRef<HTMLDivElement>(null);
+  const transactionsRef = useRef<HTMLDivElement>(null);
+
+  // Dashboard sections for search
+  const dashboardSections = [
+    {
+      keywords: ['metrics', 'cards', 'balance', 'revenue', 'expenses', 'savings'],
+      ref: metricsRef,
+      name: 'Financial Metrics'
+    },
+    {
+      keywords: ['chart', 'overview', 'graph', 'trends', 'financial overview'],
+      ref: chartRef,
+      name: 'Financial Chart'
+    },
+    {
+      keywords: ['recent transactions', 'recent', 'latest', 'activities'],
+      ref: recentTransactionsRef,
+      name: 'Recent Transactions'
+    },
+    {
+      keywords: ['transactions', 'transaction table', 'all transactions', 'table'],
+      ref: transactionsRef,
+      name: 'Transactions Table'
+    }
+  ];
+
+  // Handle search and scroll to section
+  useEffect(() => {
+    if (searchQuery.trim() && activeTab === 'dashboard') {
+      const query = searchQuery.toLowerCase().trim();
+
+      // Find matching section
+      const matchingSection = dashboardSections.find(section =>
+        section.keywords.some(keyword =>
+          keyword.toLowerCase().includes(query) ||
+          query.includes(keyword.toLowerCase())
+        )
+      );
+
+      if (matchingSection && matchingSection.ref.current) {
+        // Smooth scroll to the section
+        matchingSection.ref.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+
+        // Add visual highlight effect
+        matchingSection.ref.current.style.transform = 'scale(1.02)';
+        matchingSection.ref.current.style.transition = 'transform 0.3s ease';
+
+        // Show success alert
+        addAlert('info', `Scrolled to ${matchingSection.name}`);
+
+        // Remove highlight after animation
+        setTimeout(() => {
+          if (matchingSection.ref.current) {
+            matchingSection.ref.current.style.transform = 'scale(1)';
+          }
+        }, 500);
+      }
+    }
+  }, [searchQuery, activeTab]);
 
   // Add alert function
   const addAlert = (type: Alert['type'], message: string) => {
@@ -92,6 +159,11 @@ function DashboardContent() {
               <p className="text-gray-400">
                 Here's what's happening with your finances today.
               </p>
+              {searchQuery && activeTab === 'dashboard' && (
+                <p className="text-green-400 text-sm mt-2">
+                  💡 Try searching for: "metrics", "chart", "recent transactions", or "transactions"
+                </p>
+              )}
             </div>
             <div className="mt-4 sm:mt-0 flex items-center space-x-4">
               <div className="text-right">
@@ -110,7 +182,7 @@ function DashboardContent() {
         </div>
 
         {/* Metrics Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div ref={metricsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {dashboardData.metrics.map((metric: any, index: number) => (
             <div key={metric.title} style={{ animationDelay: `${index * 100}ms` }}>
               <MetricCard
@@ -123,16 +195,16 @@ function DashboardContent() {
 
         {/* Chart and Recent Transactions */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          <div className="xl:col-span-2">
+          <div ref={chartRef} className="xl:col-span-2">
             <Chart data={dashboardData.chartData} />
           </div>
-          <div>
+          <div ref={recentTransactionsRef}>
             <RecentTransactions transactions={dashboardData.recentTransactions} />
           </div>
         </div>
 
         {/* Transactions Table */}
-        <div>
+        <div ref={transactionsRef}>
           <TransactionTable
             onAddAlert={addAlert}
           />

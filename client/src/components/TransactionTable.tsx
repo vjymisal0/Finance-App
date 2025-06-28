@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Download, Filter, Calendar, ChevronDown, ChevronUp, Search, MoreHorizontal, Eye } from 'lucide-react';
+import { Download, Filter, Calendar, ChevronDown, ChevronUp, Search } from 'lucide-react';
 import { Transaction, FilterOptions, PaginationOptions } from '../types';
 import { apiService } from '../services/api';
 import ExportModal from './ExportModal';
@@ -130,18 +130,10 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     });
   };
 
-  const formatDateMobile = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric'
-    });
-  };
-
   const getStatusBadge = (status: string) => {
     const baseClasses = "px-3 py-1 rounded-full text-xs font-medium";
     switch (status.toLowerCase()) {
       case 'paid':
-      case 'completed':
         return `${baseClasses} bg-green-500/20 text-green-500`;
       case 'pending':
         return `${baseClasses} bg-yellow-500/20 text-yellow-500`;
@@ -160,41 +152,36 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   const totalPages = Math.ceil(pagination.total / pagination.limit);
 
   return (
-    <div className="card-enhanced">
+    <div className="bg-gray-800 rounded-xl p-6">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between p-4 sm:p-6 border-b border-gray-700/50 space-y-4 lg:space-y-0">
-        <div>
-          <h3 className="text-xl font-bold text-white mb-1">
-            {fullView ? 'All Transactions' : 'Transactions'}
-          </h3>
-          <p className="text-gray-400 text-sm">
-            {fullView ? 'Complete transaction history' : 'Recent transaction activity'}
-          </p>
-        </div>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-bold text-white">
+          {fullView ? 'All Transactions' : 'Transactions'}
+        </h3>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+        <div className="flex items-center space-x-4">
           {/* Search */}
-          <div className="relative flex-1 sm:flex-none">
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               type="text"
               placeholder="Search transactions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full sm:w-64 bg-gray-700/50 text-white placeholder-gray-400 pl-10 pr-4 py-2.5 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all duration-200"
+              className="bg-gray-700 text-white placeholder-gray-400 pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 w-64"
             />
           </div>
 
           {/* Date Filter */}
-          <div className="flex items-center space-x-2 bg-gray-700/50 px-4 py-2.5 rounded-lg border border-gray-600">
-            <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
+          <div className="flex items-center space-x-2 bg-gray-700 px-4 py-2 rounded-lg">
+            <Calendar className="w-4 h-4 text-gray-400" />
             <select
               value={filters.dateRange}
               onChange={(e) => setFilters({
                 ...filters,
                 dateRange: e.target.value as FilterOptions['dateRange']
               })}
-              className="bg-transparent text-white text-sm focus:outline-none min-w-0"
+              className="bg-transparent text-white text-sm focus:outline-none"
             >
               <option value="all">All Time</option>
               <option value="7days">Last 7 Days</option>
@@ -206,64 +193,80 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
           {/* Filter Button */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center justify-center space-x-2 bg-gray-700/50 text-white px-4 py-2.5 rounded-lg hover:bg-gray-600/50 transition-colors border border-gray-600"
+            className="flex items-center space-x-2 bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
           >
             <Filter className="w-4 h-4" />
-            <span className="hidden sm:inline">Filter</span>
+            <span>Filter</span>
           </button>
 
           {/* Export Button */}
           <button
             onClick={() => setShowExportModal(true)}
-            className="flex items-center justify-center space-x-2 bg-green-500 text-white px-4 py-2.5 rounded-lg hover:bg-green-600 transition-colors"
+            className="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
           >
             <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Export</span>
+            <span>Export</span>
           </button>
         </div>
       </div>
 
       {/* Advanced Filters */}
       {showFilters && (
-        <div className="p-4 sm:p-6 bg-gray-700/30 border-b border-gray-700/50">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Status</label>
-              <select
-                value={filters.status}
-                onChange={(e) => setFilters({
-                  ...filters,
-                  status: e.target.value as FilterOptions['status']
-                })}
-                className="w-full bg-gray-600 text-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 border border-gray-500"
-              >
-                <option value="all">All Status</option>
-                <option value="paid">Paid</option>
-                <option value="pending">Pending</option>
-              </select>
-            </div>
+        <div className="mb-6 p-4 bg-gray-700 rounded-lg grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Status</label>
+            <select
+              value={filters.status}
+              onChange={(e) => setFilters({
+                ...filters,
+                status: e.target.value as FilterOptions['status']
+              })}
+              className="w-full bg-gray-600 text-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option value="all">All Status</option>
+              <option value="paid">Paid</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
-              <select
-                value={filters.category}
-                onChange={(e) => setFilters({
-                  ...filters,
-                  category: e.target.value
-                })}
-                className="w-full bg-gray-600 text-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 border border-gray-500"
-              >
-                <option value="all">All Categories</option>
-                <option value="revenue">Revenue</option>
-                <option value="expense">Expense</option>
-              </select>
-            </div>
+          {/* <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Type</label>
+            <select
+              value={filters.type}
+              onChange={(e) => setFilters({
+                ...filters,
+                type: e.target.value as FilterOptions['type']
+              })}
+              className="w-full bg-gray-600 text-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option value="all">All Types</option>
+              <option value="income">Income</option>
+              <option value="expense">Expense</option>
+            </select>
+          </div> */}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Min Amount</label>
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
+            <select
+              value={filters.category}
+              onChange={(e) => setFilters({
+                ...filters,
+                category: e.target.value
+              })}
+              className="w-full bg-gray-600 text-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option value="all">All Categories</option>
+                           <option value="revenue">Revenue</option>
+              <option value="expense">Expense</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Amount Range</label>
+            <div className="flex space-x-2">
               <input
                 type="number"
-                placeholder="0"
+                placeholder="Min"
                 value={filters.amountRange.min}
                 onChange={(e) => setFilters({
                   ...filters,
@@ -272,15 +275,11 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                     min: Number(e.target.value)
                   }
                 })}
-                className="w-full bg-gray-600 text-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 border border-gray-500"
+                className="w-full bg-gray-600 text-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Max Amount</label>
               <input
                 type="number"
-                placeholder="10000"
+                placeholder="Max"
                 value={filters.amountRange.max}
                 onChange={(e) => setFilters({
                   ...filters,
@@ -289,7 +288,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                     max: Number(e.target.value)
                   }
                 })}
-                className="w-full bg-gray-600 text-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 border border-gray-500"
+                className="w-full bg-gray-600 text-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
           </div>
@@ -299,20 +298,17 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       {/* Loading State */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-400">Loading transactions...</p>
-          </div>
+          <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : (
         <>
-          {/* Desktop Table */}
-          <div className="hidden lg:block overflow-x-auto">
+          {/* Table */}
+          <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-700/50">
+                <tr className="border-b border-gray-700">
                   <th
-                    className="text-left text-gray-400 font-medium pb-4 px-6 cursor-pointer hover:text-white transition-colors"
+                    className="text-left text-gray-400 font-medium pb-4 cursor-pointer hover:text-white transition-colors"
                     onClick={() => handleSort('name')}
                   >
                     <div className="flex items-center">
@@ -321,7 +317,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                     </div>
                   </th>
                   <th
-                    className="text-left text-gray-400 font-medium pb-4 px-6 cursor-pointer hover:text-white transition-colors"
+                    className="text-left text-gray-400 font-medium pb-4 cursor-pointer hover:text-white transition-colors"
                     onClick={() => handleSort('date')}
                   >
                     <div className="flex items-center">
@@ -330,7 +326,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                     </div>
                   </th>
                   <th
-                    className="text-left text-gray-400 font-medium pb-4 px-6 cursor-pointer hover:text-white transition-colors"
+                    className="text-left text-gray-400 font-medium pb-4 cursor-pointer hover:text-white transition-colors"
                     onClick={() => handleSort('amount')}
                   >
                     <div className="flex items-center">
@@ -339,7 +335,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                     </div>
                   </th>
                   <th
-                    className="text-left text-gray-400 font-medium pb-4 px-6 cursor-pointer hover:text-white transition-colors"
+                    className="text-left text-gray-400 font-medium pb-4 cursor-pointer hover:text-white transition-colors"
                     onClick={() => handleSort('status')}
                   >
                     <div className="flex items-center">
@@ -347,18 +343,15 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                       <SortIcon field="status" />
                     </div>
                   </th>
-                  <th className="text-left text-gray-400 font-medium pb-4 px-6">
-                    Actions
-                  </th>
                 </tr>
               </thead>
               <tbody>
                 {sortedTransactions.map((transaction) => (
                   <tr
                     key={transaction.id}
-                    className="border-b border-gray-700/30 hover:bg-gray-700/20 transition-colors"
+                    className="border-b border-gray-700 hover:bg-gray-750 transition-colors"
                   >
-                    <td className="py-4 px-6">
+                    <td className="py-4">
                       <div className="flex items-center">
                         <img
                           src={transaction.avatar}
@@ -371,24 +364,19 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                         </div>
                       </div>
                     </td>
-                    <td className="py-4 px-6 text-gray-300">
+                    <td className="py-4 text-gray-300">
                       {formatDate(transaction.date)}
                     </td>
-                    <td className="py-4 px-6">
+                    <td className="py-4">
                       <span className={`font-semibold ${transaction.amount >= 0 ? 'text-green-500' : 'text-orange-500'
                         }`}>
                         {formatAmount(transaction.amount)}
                       </span>
                     </td>
-                    <td className="py-4 px-6">
+                    <td className="py-4">
                       <span className={getStatusBadge(transaction.status)}>
                         {transaction.status}
                       </span>
-                    </td>
-                    <td className="py-4 px-6">
-                      <button className="p-2 rounded-lg hover:bg-gray-600/50 text-gray-400 hover:text-white transition-colors">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </button>
                     </td>
                   </tr>
                 ))}
@@ -396,71 +384,27 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             </table>
           </div>
 
-          {/* Mobile Cards */}
-          <div className="lg:hidden">
-            <div className="p-4 space-y-4">
-              {sortedTransactions.map((transaction) => (
-                <div
-                  key={transaction.id}
-                  className="bg-gray-700/30 rounded-xl p-4 hover:bg-gray-700/50 transition-colors"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center space-x-3">
-                      <img
-                        src={transaction.avatar}
-                        alt={transaction.name}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                      <div>
-                        <div className="text-white font-medium text-sm">{transaction.name}</div>
-                        <div className="text-gray-400 text-xs">{transaction.email}</div>
-                      </div>
-                    </div>
-                    <button className="p-2 rounded-lg hover:bg-gray-600/50 text-gray-400 hover:text-white transition-colors">
-                      <MoreHorizontal className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="text-gray-400 text-xs">
-                        {formatDateMobile(transaction.date)}
-                      </div>
-                      <span className={getStatusBadge(transaction.status)}>
-                        {transaction.status}
-                      </span>
-                    </div>
-                    <div className={`font-semibold text-lg ${transaction.amount >= 0 ? 'text-green-500' : 'text-orange-500'
-                      }`}>
-                      {formatAmount(transaction.amount)}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
           {/* Pagination */}
           {fullView && totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 border-t border-gray-700/50 space-y-4 sm:space-y-0">
-              <div className="text-sm text-gray-400 text-center sm:text-left">
+            <div className="flex items-center justify-between mt-6">
+              <div className="text-sm text-gray-400">
                 Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} transactions
               </div>
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
                   disabled={pagination.page === 1}
-                  className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Previous
                 </button>
-                <span className="text-gray-400 px-4">
+                <span className="text-gray-400">
                   Page {pagination.page} of {totalPages}
                 </span>
                 <button
                   onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
                   disabled={pagination.page === totalPages}
-                  className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>
@@ -469,7 +413,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
           )}
 
           {/* Results Summary */}
-          <div className="p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between text-sm text-gray-400 space-y-2 sm:space-y-0">
+          <div className="mt-4 flex items-center justify-between text-sm text-gray-400">
             <span>
               Showing {sortedTransactions.length} of {pagination.total} transactions
             </span>
