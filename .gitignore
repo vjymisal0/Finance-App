@@ -9,6 +9,7 @@ lerna-debug.log*
 
 
 \.bolt
+/SERVER_DOCUMENTATION.md
 
 
 node_modules
