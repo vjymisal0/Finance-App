@@ -6,6 +6,7 @@ A modern, full-stack financial dashboard application built with React and Node.j
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
+- [Screenshots](#screenshots)
 - [Quick Start](#quick-start)
 - [Setup Guide](#setup-guide)
 - [Running the Application](#running-the-application)
@@ -32,6 +33,33 @@ A modern, full-stack financial dashboard application built with React and Node.j
 **Frontend:** React 18 + TypeScript + Vite + Tailwind CSS + Recharts  
 **Backend:** Node.js + Express + MongoDB + JWT  
 **Tools:** ESLint + PostCSS + VS Code Extensions
+
+---
+
+## Screenshots
+
+### Dashboard Overview
+![Dashboard Overview](screenshots/Dashboard.png)
+
+### Transaction Management
+![Transaction Management](screenshots/Transactions.png)
+
+### Export Features
+![Export Features](screenshots/Exporting-Transactions.png)
+
+### Analytics & Reports
+![Analytics and Reports](screenshots/Analytics.png)
+
+![Analytics Reports](screenshots/Analytics2.png)
+
+![Analytics Reports](screenshots/Analytics3.png)
+
+![Analytics Reports](screenshots/Analytics4.png)
+
+### User Authentication
+![Login and Registration](screenshots/Login.png)
+![Login and Registration](screenshots/Registration.png)
+
 
 ---
 
