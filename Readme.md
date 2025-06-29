@@ -40,15 +40,16 @@ A modern, full-stack financial dashboard application built with React and Node.j
 
 ### Dashboard Overview
 ![Dashboard Overview](screenshots/Dashboard.png)
+![Dashboard Overview](screenshots/Dashboard2.png)
 
 ### Transaction Management
-![Transaction Management](screenshots/Transactions.png)
+![Transaction Management](screenshots/transaction.png)
 
 ### Export Features
-![Export Features](screenshots/Exporting-Transactions.png)
+![Export Features](screenshots/export.png)
 
 ### Analytics & Reports
-![Analytics and Reports](screenshots/Analytics.png)
+![Analytics and Reports](screenshots/Analytics1.png)
 
 ![Analytics Reports](screenshots/Analytics2.png)
 

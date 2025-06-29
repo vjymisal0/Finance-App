@@ -278,7 +278,11 @@ function DashboardContent() {
   return (
     <div className="min-h-screen bg-gray-900">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-      <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <Header
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        activeTab={activeTab}
+      />
 
       {/* Alert System */}
       <AlertSystem alerts={alerts} onRemoveAlert={removeAlert} />
