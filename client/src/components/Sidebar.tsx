@@ -57,13 +57,19 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
         w-64 bg-gray-900 h-screen p-6 fixed left-0 top-0 z-40 transition-transform duration-300 ease-in-out
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
+        {/* Logo Section */}
         <div className="flex items-center mb-8">
-          <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-lg">P</span>
+          <div className="w-10 h-10 mr-3 flex-shrink-0">
+            <img
+              src="/salary.png"
+              alt="FinStack Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
-          <span className="text-white text-xl font-bold ml-3">FinStack</span>
+          <span className="text-white text-xl font-bold">FinStack</span>
         </div>
 
+        {/* Navigation Menu */}
         <nav className="space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
@@ -74,7 +80,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
                 key={item.id}
                 onClick={() => handleMenuItemClick(item.id)}
                 className={`w-full flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${isActive
-                    ? ' text-green-500'
+                    ? 'bg-green-500/20 text-green-400 border border-green-500/30 shadow-glow'
                     : 'text-gray-400 hover:text-white hover:bg-gray-800'
                   }`}
               >
