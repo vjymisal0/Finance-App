@@ -103,7 +103,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg backdrop-blur-sm">
+            <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg">
               <p className="text-red-400 text-sm">{error}</p>
             </div>
           )}
@@ -114,7 +114,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
                 Full Name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white w-5 h-5" />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
                   id="name"
@@ -122,7 +122,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
                   value={credentials.name}
                   onChange={handleChange}
                   required
-                  className="w-full bg-gray-800/80 text-white pl-12 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all backdrop-blur-sm"
+                  className="w-full bg-gray-800/80 text-white pl-12 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                   placeholder="Enter your full name"
                 />
               </div>
@@ -160,7 +160,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
                   value={credentials.password}
                   onChange={handleChange}
                   required
-                  className="w-full bg-gray-800/80 text-white pl-12 pr-12 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all backdrop-blur-sm"
+                  className="w-full bg-gray-800/80 text-white pl-12 pr-12 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                   placeholder="Create a password"
                 />
                 <button
@@ -186,7 +186,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
                   value={credentials.confirmPassword}
                   onChange={handleChange}
                   required
-                  className={`w-full bg-gray-800/80 text-white pl-12 pr-12 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:border-transparent transition-all backdrop-blur-sm ${credentials.confirmPassword && !passwordsMatch
+                  className={`w-full bg-gray-800/80 text-white pl-12 pr-12 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:border-transparent transition-all ${credentials.confirmPassword && !passwordsMatch
                       ? 'border-red-500 focus:ring-red-500'
                       : 'focus:ring-green-500'
                     }`}
