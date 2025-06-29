@@ -54,7 +54,8 @@ export const getAnalyticsData = async (req, res) => {
                         totalExpenses: 0,
                         netProfit: 0,
                         avgTransaction: 0,
-                        totalTransactions: 0
+                        totalTransactions: 0,
+                        profitMargin: 0
                     }
                 }
             });
@@ -88,7 +89,7 @@ const processAnalyticsData = async (transactions) => {
     // Status distribution
     const statusDistribution = processStatusDistribution(transactions);
 
-    // User activity analysis
+    // User activity analysis with actual user names
     const userActivity = processUserActivity(transactions);
 
     // Amount distribution
@@ -215,10 +216,12 @@ const processUserActivity = (transactions) => {
 
     transactions.forEach(transaction => {
         const userId = transaction.user_id || 'Unknown';
+        const userName = transaction.user_name || 'Unknown User'; // Use actual user_name from database
         const amount = Math.abs(transaction.amount);
 
         if (!userActivity[userId]) {
             userActivity[userId] = {
+                userName: userName,
                 transactions: 0,
                 totalAmount: 0,
                 revenue: 0,
@@ -243,8 +246,9 @@ const processUserActivity = (transactions) => {
     });
 
     return Object.entries(userActivity)
-        .map(([user, data]) => ({
-            user,
+        .map(([userId, data]) => ({
+            user: data.userName, // Shows actual user name from database
+            userId: userId,
             transactions: data.transactions,
             totalAmount: Math.round(data.totalAmount * 100) / 100,
             revenue: Math.round(data.revenue * 100) / 100,
@@ -432,7 +436,7 @@ export const getAnalyticsSummary = async (req, res) => {
 
         const summary = calculateSummary(transactions);
 
-        // Additional insights
+        // Additional insights with actual user names
         const insights = {
             topCategory: null,
             mostActiveUser: null,
@@ -445,7 +449,7 @@ export const getAnalyticsSummary = async (req, res) => {
             const categoryBreakdown = processCategoryBreakdown(transactions);
             insights.topCategory = categoryBreakdown[0];
 
-            // Find most active user
+            // Find most active user with actual user name
             const userActivity = processUserActivity(transactions);
             insights.mostActiveUser = userActivity[0];
 

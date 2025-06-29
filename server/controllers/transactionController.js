@@ -14,10 +14,11 @@ export const getTransactions = async (req, res) => {
 
     // Build query
     let query = {};
-    
-    // Search filter
+
+    // Search filter - search through user names, user_id, and category
     if (search) {
       query.$or = [
+        { user_name: { $regex: search, $options: 'i' } },
         { user_id: { $regex: search, $options: 'i' } },
         { category: { $regex: search, $options: 'i' } }
       ];
@@ -37,7 +38,7 @@ export const getTransactions = async (req, res) => {
     if (dateRange !== 'all') {
       const now = new Date();
       let startDate;
-      
+
       switch (dateRange) {
         case '7days':
           startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -49,7 +50,7 @@ export const getTransactions = async (req, res) => {
           startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
           break;
       }
-      
+
       if (startDate) {
         query.date = { $gte: startDate.toISOString() };
       }
@@ -57,8 +58,8 @@ export const getTransactions = async (req, res) => {
 
     // Get paginated results
     const { transactions, total } = await Transaction.findWithPagination(
-      query, 
-      parseInt(page), 
+      query,
+      parseInt(page),
       parseInt(limit)
     );
 
@@ -88,14 +89,14 @@ export const getTransactions = async (req, res) => {
 export const exportTransactions = async (req, res) => {
   try {
     const { columns, dateRange, filters, format } = req.body;
-    
+
     // Build query based on filters
     let query = {};
-    
+
     if (filters.status !== 'all') {
       query.status = { $regex: new RegExp(filters.status, 'i') };
     }
-    
+
     if (filters.category !== 'all') {
       query.category = { $regex: new RegExp(filters.category, 'i') };
     }
@@ -109,24 +110,27 @@ export const exportTransactions = async (req, res) => {
     }
 
     const transactions = await Transaction.find(query);
-    
-    // Transform data for export
-    const exportData = transactions.map(transaction => ({
-      name: transaction.user_id || 'Unknown User',
-      email: `${transaction.user_id}@example.com`,
-      date: transaction.date,
-      amount: transaction.amount,
-      status: transaction.status || 'Completed',
-      type: transaction.category === 'Revenue' ? 'Income' : 'Expense',
-      category: transaction.category,
-      description: `${transaction.category} transaction`
-    }));
+
+    // Transform data for export with actual user names from database
+    const exportData = transactions.map(transaction => {
+      const transformed = Transaction.transformForResponse(transaction);
+      return {
+        name: transformed.name, // Uses actual user_name from database
+        email: transformed.email,
+        date: transformed.date,
+        amount: transformed.amount,
+        status: transformed.status,
+        type: transformed.type,
+        category: transformed.category,
+        description: transformed.description
+      };
+    });
 
     // Create CSV content
     const headers = columns;
     const csvContent = [
       headers.join(','),
-      ...exportData.map(transaction => 
+      ...exportData.map(transaction =>
         columns.map(column => {
           const value = transaction[column];
           return typeof value === 'string' ? `"${value}"` : value;

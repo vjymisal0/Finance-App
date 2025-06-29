@@ -4,6 +4,7 @@ import { getDatabase } from '../config/database.js';
 export class Transaction {
   constructor(transactionData) {
     this.user_id = transactionData.user_id;
+    this.user_name = transactionData.user_name;
     this.amount = transactionData.amount;
     this.category = transactionData.category;
     this.status = transactionData.status || 'Completed';
@@ -50,7 +51,7 @@ export class Transaction {
   static transformForResponse(transaction) {
     return {
       id: transaction._id.toString(),
-      name: transaction.user_id || 'Unknown User',
+      name: transaction.user_name || 'Unknown User',
       email: `${transaction.user_id}@example.com`,
       date: transaction.date,
       amount: transaction.amount,
