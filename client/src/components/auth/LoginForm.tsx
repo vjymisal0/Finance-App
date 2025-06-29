@@ -82,21 +82,25 @@ const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
       <div className="relative z-10 w-full max-w-md">
         <div className="glass rounded-3xl p-8 shadow-2xl border border-gray-700/50 backdrop-blur-xl">
           {/* Header */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-8 p-1">
             <div className="flex items-center justify-center mb-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-glow">
-                <div className="relative">
-                  <DollarSign className="w-8 h-8 text-white" />
-                  <TrendingUp className="w-4 h-4 text-white absolute -top-1 -right-1" />
-                </div>
+              <div className="flex items-center mb-8">
+                <div className="w-20 h-20  flex-shrink-0 mr-3">
+                  <img
+                    src="/salary.png"
+                    alt="FinStack Logo"
+                    className="w-full h-full object-contain"
+                  />
               </div>
+                </div>
             </div>
+
             <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
             <p className="text-gray-400">Sign in to your financial dashboard</p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg backdrop-blur-sm">
+            <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg">
               <p className="text-red-400 text-sm">{error}</p>
             </div>
           )}
@@ -115,7 +119,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
                   value={credentials.email}
                   onChange={handleChange}
                   required
-                  className="w-full bg-gray-800/80 text-white pl-12 pr-4 py-3 rounded-xl border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all backdrop-blur-sm"
+                  className="w-full bg-gray-800/80 text-white pl-12 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                   placeholder="Enter your email"
                 />
               </div>
@@ -134,7 +138,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
                   value={credentials.password}
                   onChange={handleChange}
                   required
-                  className="w-full bg-gray-800/80 text-white pl-12 pr-12 py-3 rounded-xl border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all backdrop-blur-sm"
+                  className="w-full bg-gray-800/80 text-white pl-12 pr-12 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                   placeholder="Enter your password"
                 />
                 <button
@@ -151,7 +155,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  className="w-4 h-4 text-green-500 bg-gray-800 border-gray-600 rounded focus:ring-green-500 focus:ring-2"
+                  className="w-4 h-4 text-green-500 bg-gray-800 rounded focus:ring-green-500 focus:ring-2"
                 />
                 <span className="ml-2 text-sm text-gray-300">Remember me</span>
               </label>
@@ -192,7 +196,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
           </div>
 
           {/* Demo Credentials Card */}
-          <div className="mt-6 p-4 bg-gray-800/60 rounded-xl border border-gray-700/50 backdrop-blur-sm">
+          <div className="mt-6 p-4 bg-gray-800/60 rounded-xl border border-gray-700/50">
             <div className="flex items-center justify-between mb-3">
               <p className="text-gray-400 text-sm font-medium">Demo Credentials</p>
               <button

@@ -86,15 +86,18 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
       <div className="relative z-10 w-full max-w-md">
         <div className="glass rounded-3xl p-8 shadow-2xl border border-gray-700/50 backdrop-blur-xl">
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center mb-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-glow">
-                <div className="relative">
-                  <DollarSign className="w-8 h-8 text-white" />
-                  <TrendingUp className="w-4 h-4 text-white absolute -top-1 -right-1" />
+          <div className="text-center mb-3">
+            <div className="flex items-center justify-center mb-6"> 
+              <div className="flex items-center mb-8">
+                <div className="w-20 h-20  mt-4 flex-shrink-0 mr-3 ">
+                  <img
+                    src="/salary.png"
+                    alt="FinStack Logo"
+                    className="w-full h-full object-contain"
+                  />
                 </div>
               </div>
-            </div>
+              </div>
             <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
             <p className="text-gray-400">Join us to manage your finances</p>
           </div>
@@ -111,7 +114,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
                 Full Name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white w-5 h-5" />
                 <input
                   type="text"
                   id="name"
@@ -119,7 +122,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
                   value={credentials.name}
                   onChange={handleChange}
                   required
-                  className="w-full bg-gray-800/80 text-white pl-12 pr-4 py-3 rounded-xl border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all backdrop-blur-sm"
+                  className="w-full bg-gray-800/80 text-white pl-12 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all backdrop-blur-sm"
                   placeholder="Enter your full name"
                 />
               </div>
@@ -138,7 +141,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
                   value={credentials.email}
                   onChange={handleChange}
                   required
-                  className="w-full bg-gray-800/80 text-white pl-12 pr-4 py-3 rounded-xl border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all backdrop-blur-sm"
+                  className="w-full bg-gray-800/80 text-white pl-12 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                   placeholder="Enter your email"
                 />
               </div>
@@ -157,7 +160,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
                   value={credentials.password}
                   onChange={handleChange}
                   required
-                  className="w-full bg-gray-800/80 text-white pl-12 pr-12 py-3 rounded-xl border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all backdrop-blur-sm"
+                  className="w-full bg-gray-800/80 text-white pl-12 pr-12 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all backdrop-blur-sm"
                   placeholder="Create a password"
                 />
                 <button
@@ -185,7 +188,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
                   required
                   className={`w-full bg-gray-800/80 text-white pl-12 pr-12 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:border-transparent transition-all backdrop-blur-sm ${credentials.confirmPassword && !passwordsMatch
                       ? 'border-red-500 focus:ring-red-500'
-                      : 'border-gray-600 focus:ring-green-500'
+                      : 'focus:ring-green-500'
                     }`}
                   placeholder="Confirm your password"
                 />
@@ -207,7 +210,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
                 type="checkbox"
                 id="terms"
                 required
-                className="w-4 h-4 text-green-500 bg-gray-800 border-gray-600 rounded focus:ring-green-500 focus:ring-2"
+                className="w-4 h-4 text-green-500 bg-gray-800 rounded focus:ring-green-500 focus:ring-2"
               />
               <label htmlFor="terms" className="ml-2 text-sm text-gray-300">
                 I agree to the{' '}
