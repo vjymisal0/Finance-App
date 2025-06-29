@@ -294,42 +294,44 @@ const Analytics: React.FC = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
             {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-2xl font-bold text-white mb-2">Analytics Dashboard</h2>
-                    <p className="text-gray-400">Comprehensive financial insights from real transaction data</p>
+            <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+                <div className="text-center lg:text-left">
+                    <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Analytics Dashboard</h2>
+                    <p className="text-sm sm:text-base text-gray-400">Comprehensive financial insights from real transaction data</p>
                 </div>
 
-                <div className="flex items-center space-x-4">
+                <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4">
                     <select
                         value={selectedPeriod}
                         onChange={(e) => setSelectedPeriod(e.target.value)}
-                        className="bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full sm:w-auto bg-gray-700 text-white px-3 sm:px-4 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
                     >
                         <option value="3months">Last 3 Months</option>
                         <option value="6months">Last 6 Months</option>
                         <option value="1year">Last Year</option>
                     </select>
 
-                    <button
-                        onClick={handleRefresh}
-                        className="flex items-center space-x-2 bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
-                    >
-                        <RefreshCw className="w-4 h-4" />
-                        <span>Refresh</span>
-                    </button>
+                    <div className="flex space-x-2 sm:space-x-4">
+                        <button
+                            onClick={handleRefresh}
+                            className="flex-1 sm:flex-none flex items-center justify-center space-x-2 bg-gray-700 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors text-sm"
+                        >
+                            <RefreshCw className="w-4 h-4" />
+                            <span className="hidden sm:inline">Refresh</span>
+                        </button>
 
-                    <button className="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
-                        <Download className="w-4 h-4" />
-                        <span>Export</span>
-                    </button>
+                        <button className="flex-1 sm:flex-none flex items-center justify-center space-x-2 bg-green-500 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm">
+                            <Download className="w-4 h-4" />
+                            <span className="hidden sm:inline">Export</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
             {/* Key Metrics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {[
                     {
                         title: 'Total Revenue',
@@ -360,12 +362,12 @@ const Analytics: React.FC = () => {
                         change: analyticsData.summary.totalTransactions + ' total'
                     }
                 ].map((metric, index) => (
-                    <div key={index} className="bg-gray-800 rounded-xl p-6">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="text-gray-400 text-sm font-medium">{metric.title}</div>
-                            <metric.icon className={`w-5 h-5 ${metric.color}`} />
+                    <div key={index} className="bg-gray-800 rounded-xl p-4 sm:p-6">
+                        <div className="flex items-center justify-between mb-3 sm:mb-4">
+                            <div className="text-gray-400 text-xs sm:text-sm font-medium">{metric.title}</div>
+                            <metric.icon className={`w-4 h-4 sm:w-5 sm:h-5 ${metric.color}`} />
                         </div>
-                        <div className="text-2xl font-bold text-white mb-2">
+                        <div className="text-lg sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                             ${metric.value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                         </div>
                         <div className="text-xs text-gray-400">{metric.change}</div>
@@ -375,14 +377,22 @@ const Analytics: React.FC = () => {
 
             {/* Revenue vs Expenses Trend */}
             {analyticsData.monthlyTrends.length > 0 && (
-                <div className="bg-gray-800 rounded-xl p-6">
-                    <h3 className="text-xl font-bold text-white mb-4">Revenue vs Expenses Trend</h3>
-                    <div className="h-80">
+                <div className="bg-gray-800 rounded-xl p-4 sm:p-6">
+                    <h3 className="text-lg sm:text-xl font-bold text-white mb-4">Revenue vs Expenses Trend</h3>
+                    <div className="h-64 sm:h-80">
                         <ResponsiveContainer width="100%" height="100%">
                             <ComposedChart data={analyticsData.monthlyTrends}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                                <XAxis dataKey="month" stroke="#9CA3AF" fontSize={12} />
-                                <YAxis stroke="#9CA3AF" fontSize={12} tickFormatter={(value) => `$${value}`} />
+                                <XAxis
+                                    dataKey="month"
+                                    stroke="#9CA3AF"
+                                    fontSize={10}
+                                    interval="preserveStartEnd"
+                                    angle={-45}
+                                    textAnchor="end"
+                                    height={60}
+                                />
+                                <YAxis stroke="#9CA3AF" fontSize={10} tickFormatter={(value) => `$${value}`} />
                                 <Tooltip content={<CustomTooltip />} />
                                 <Legend />
                                 <Area type="monotone" dataKey="revenue" stackId="1" stroke="#10B981" fill="#10B981" fillOpacity={0.3} />
@@ -395,12 +405,12 @@ const Analytics: React.FC = () => {
             )}
 
             {/* New Chart.js Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                 {/* Scatter Plot - Revenue vs Profit Margin */}
                 {analyticsData.performanceMetrics.length > 0 && (
-                    <div className="bg-gray-800 rounded-xl p-6">
-                        <h3 className="text-xl font-bold text-white mb-4">Revenue vs Profit Margin Analysis</h3>
-                        <div className="h-80">
+                    <div className="bg-gray-800 rounded-xl p-4 sm:p-6">
+                        <h3 className="text-lg sm:text-xl font-bold text-white mb-4">Revenue vs Profit Margin Analysis</h3>
+                        <div className="h-64 sm:h-80">
                             <ChartJSScatter
                                 data={scatterData}
                                 options={{
@@ -444,9 +454,9 @@ const Analytics: React.FC = () => {
 
                 {/* Floating Bar Chart - Revenue and Expense Ranges */}
                 {analyticsData.monthlyTrends.length > 0 && (
-                    <div className="bg-gray-800 rounded-xl p-6">
-                        <h3 className="text-xl font-bold text-white mb-4">Monthly Financial Ranges</h3>
-                        <div className="h-80">
+                    <div className="bg-gray-800 rounded-xl p-4 sm:p-6">
+                        <h3 className="text-lg sm:text-xl font-bold text-white mb-4">Monthly Financial Ranges</h3>
+                        <div className="h-64 sm:h-80">
                             <ChartJSBar
                                 data={floatingBarData}
                                 options={{
@@ -478,9 +488,9 @@ const Analytics: React.FC = () => {
 
             {/* Chart.js Line Chart - Daily Trends */}
             {analyticsData.timeSeriesData.length > 0 && (
-                <div className="bg-gray-800 rounded-xl p-6">
-                    <h3 className="text-xl font-bold text-white mb-4">Daily Financial Trends (Last 30 Days)</h3>
-                    <div className="h-80">
+                <div className="bg-gray-800 rounded-xl p-4 sm:p-6">
+                    <h3 className="text-lg sm:text-xl font-bold text-white mb-4">Daily Financial Trends (Last 30 Days)</h3>
+                    <div className="h-64 sm:h-80">
                         <ChartJSLine
                             data={lineChartData}
                             options={{
@@ -519,12 +529,12 @@ const Analytics: React.FC = () => {
             )}
 
             {/* Category Breakdown and Status Distribution */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                 {/* Category Breakdown Pie Chart */}
                 {analyticsData.categoryBreakdown.length > 0 && (
-                    <div className="bg-gray-800 rounded-xl p-6">
-                        <h3 className="text-xl font-bold text-white mb-4">Category Breakdown</h3>
-                        <div className="h-80">
+                    <div className="bg-gray-800 rounded-xl p-4 sm:p-6">
+                        <h3 className="text-lg sm:text-xl font-bold text-white mb-4">Category Breakdown</h3>
+                        <div className="h-64 sm:h-80">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
@@ -533,7 +543,7 @@ const Analytics: React.FC = () => {
                                         cy="50%"
                                         labelLine={false}
                                         label={({ category, percentage }) => `${category} (${percentage.toFixed(1)}%)`}
-                                        outerRadius={80}
+                                        outerRadius={window.innerWidth < 640 ? 60 : 80}
                                         fill="#8884d8"
                                         dataKey="amount"
                                     >
@@ -550,14 +560,21 @@ const Analytics: React.FC = () => {
 
                 {/* Amount Distribution */}
                 {analyticsData.amountDistribution.length > 0 && (
-                    <div className="bg-gray-800 rounded-xl p-6">
-                        <h3 className="text-xl font-bold text-white mb-4">Transaction Amount Distribution</h3>
-                        <div className="h-80">
+                    <div className="bg-gray-800 rounded-xl p-4 sm:p-6">
+                        <h3 className="text-lg sm:text-xl font-bold text-white mb-4">Transaction Amount Distribution</h3>
+                        <div className="h-64 sm:h-80">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={analyticsData.amountDistribution}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                                    <XAxis dataKey="range" stroke="#9CA3AF" fontSize={12} />
-                                    <YAxis stroke="#9CA3AF" fontSize={12} />
+                                    <XAxis
+                                        dataKey="range"
+                                        stroke="#9CA3AF"
+                                        fontSize={10}
+                                        angle={-45}
+                                        textAnchor="end"
+                                        height={60}
+                                    />
+                                    <YAxis stroke="#9CA3AF" fontSize={10} />
                                     <Tooltip content={<CustomTooltip />} />
                                     <Bar dataKey="count" fill="#F59E0B" />
                                 </BarChart>
@@ -568,24 +585,24 @@ const Analytics: React.FC = () => {
             </div>
 
             {/* Data Summary */}
-            <div className="bg-gray-800 rounded-xl p-6">
-                <h3 className="text-xl font-bold text-white mb-4">Data Summary</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                    <div>
-                        <div className="text-2xl font-bold text-green-500">{analyticsData.summary.totalTransactions}</div>
-                        <div className="text-gray-400 text-sm">Total Transactions</div>
+            <div className="bg-gray-800 rounded-xl p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-4">Data Summary</h3>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-center">
+                    <div className="p-3 sm:p-4 bg-gray-700/50 rounded-lg">
+                        <div className="text-xl sm:text-2xl font-bold text-green-500">{analyticsData.summary.totalTransactions}</div>
+                        <div className="text-gray-400 text-xs sm:text-sm mt-1">Total Transactions</div>
                     </div>
-                    <div>
-                        <div className="text-2xl font-bold text-blue-500">{analyticsData.categoryBreakdown.length}</div>
-                        <div className="text-gray-400 text-sm">Categories</div>
+                    <div className="p-3 sm:p-4 bg-gray-700/50 rounded-lg">
+                        <div className="text-xl sm:text-2xl font-bold text-blue-500">{analyticsData.categoryBreakdown.length}</div>
+                        <div className="text-gray-400 text-xs sm:text-sm mt-1">Categories</div>
                     </div>
-                    <div>
-                        <div className="text-2xl font-bold text-purple-500">{analyticsData.userActivity.length}</div>
-                        <div className="text-gray-400 text-sm">Active Users</div>
+                    <div className="p-3 sm:p-4 bg-gray-700/50 rounded-lg">
+                        <div className="text-xl sm:text-2xl font-bold text-purple-500">{analyticsData.userActivity.length}</div>
+                        <div className="text-gray-400 text-xs sm:text-sm mt-1">Active Users</div>
                     </div>
-                    <div>
-                        <div className="text-2xl font-bold text-orange-500">{analyticsData.summary.profitMargin.toFixed(1)}%</div>
-                        <div className="text-gray-400 text-sm">Profit Margin</div>
+                    <div className="p-3 sm:p-4 bg-gray-700/50 rounded-lg">
+                        <div className="text-xl sm:text-2xl font-bold text-orange-500">{analyticsData.summary.profitMargin.toFixed(1)}%</div>
+                        <div className="text-gray-400 text-xs sm:text-sm mt-1">Profit Margin</div>
                     </div>
                 </div>
             </div>
