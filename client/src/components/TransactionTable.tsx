@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Download, Filter, Calendar, ChevronDown, ChevronUp, Search } from 'lucide-react';
+import { Download, Filter, Calendar, ChevronDown, ChevronUp, Search, ArrowUpDown } from 'lucide-react';
 import { Transaction, FilterOptions, PaginationOptions } from '../types';
 import { apiService } from '../services/api';
 import ExportModal from './ExportModal';
@@ -37,7 +37,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     amountRange: { min: 0, max: 10000 }
   });
 
-  // Fetch transactions
+  // Fetch transactions with server-side sorting
   const fetchTransactions = async () => {
     try {
       setLoading(true);
@@ -45,7 +45,9 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
         pagination.page,
         pagination.limit,
         filters,
-        searchQuery
+        searchQuery,
+        sortField,
+        sortDirection
       );
       setTransactions(response.data);
       if (response.pagination) {
@@ -63,9 +65,9 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
 
   useEffect(() => {
     fetchTransactions();
-  }, [pagination.page, pagination.limit, filters, searchQuery]);
+  }, [pagination.page, pagination.limit, filters, searchQuery, sortField, sortDirection]);
 
-  // Handle sort
+  // Handle sort - now triggers server-side sorting
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -73,41 +75,17 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       setSortField(field);
       setSortDirection('desc');
     }
+    // Reset to first page when sorting changes
+    setPagination(prev => ({ ...prev, page: 1 }));
   };
 
-  // Sort transactions locally
-  const sortedTransactions = [...transactions].sort((a, b) => {
-    let aValue, bValue;
-
-    switch (sortField) {
-      case 'date':
-        aValue = new Date(a.date).getTime();
-        bValue = new Date(b.date).getTime();
-        break;
-      case 'amount':
-        aValue = Math.abs(a.amount);
-        bValue = Math.abs(b.amount);
-        break;
-      case 'name':
-        aValue = a.name.toLowerCase();
-        bValue = b.name.toLowerCase();
-        break;
-      case 'status':
-        aValue = a.status.toLowerCase();
-        bValue = b.status.toLowerCase();
-        break;
-      default:
-        return 0;
-    }
-
-    if (sortDirection === 'asc') {
-      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-    } else {
-      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-    }
-  });
-
   const handleExport = (config: any) => {
+    // Include current sorting in export config
+    const exportConfig = {
+      ...config,
+      sortField,
+      sortDirection
+    };
     onAddAlert('success', `Successfully exported ${transactions.length} transactions`);
   };
 
@@ -143,10 +121,12 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   };
 
   const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) return null;
+    if (sortField !== field) {
+      return <ArrowUpDown className="w-4 h-4 ml-1 text-gray-500" />;
+    }
     return sortDirection === 'asc' ?
-      <ChevronUp className="w-4 h-4 ml-1" /> :
-      <ChevronDown className="w-4 h-4 ml-1" />;
+      <ChevronUp className="w-4 h-4 ml-1 text-green-400" /> :
+      <ChevronDown className="w-4 h-4 ml-1 text-green-400" />;
   };
 
   const totalPages = Math.ceil(pagination.total / pagination.limit);
@@ -155,9 +135,16 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     <div className="bg-gray-800 rounded-xl p-4 sm:p-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 space-y-4 sm:space-y-0">
-        <h3 className="text-xl font-bold text-white">
-          {fullView ? 'All Transactions' : 'Transactions'}
-        </h3>
+        <div>
+          <h3 className="text-xl font-bold text-white">
+            {fullView ? 'All Transactions' : 'Transactions'}
+          </h3>
+          {sortField !== 'date' || sortDirection !== 'desc' ? (
+            <p className="text-sm text-gray-400 mt-1">
+              Sorted by {sortField} ({sortDirection === 'asc' ? 'ascending' : 'descending'})
+            </p>
+          ) : null}
+        </div>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
           {/* Search */}
@@ -330,7 +317,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {sortedTransactions.map((transaction) => (
+                {transactions.map((transaction) => (
                   <tr
                     key={transaction.id}
                     className="border-b border-gray-700 hover:bg-gray-750 transition-colors"
@@ -370,7 +357,30 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
 
           {/* Mobile/Tablet Card Layout */}
           <div className="lg:hidden space-y-4">
-            {sortedTransactions.map((transaction) => (
+            {/* Sort Controls for Mobile */}
+            <div className="flex items-center justify-between bg-gray-700/50 rounded-lg p-3">
+              <span className="text-sm text-gray-300">Sort by:</span>
+              <div className="flex items-center space-x-2">
+                <select
+                  value={sortField}
+                  onChange={(e) => setSortField(e.target.value as SortField)}
+                  className="bg-gray-600 text-white text-sm px-3 py-1 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="date">Date</option>
+                  <option value="name">Name</option>
+                  <option value="amount">Amount</option>
+                  <option value="status">Status</option>
+                </select>
+                <button
+                  onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
+                  className="bg-gray-600 text-white p-1 rounded hover:bg-gray-500 transition-colors"
+                >
+                  {sortDirection === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {transactions.map((transaction) => (
               <div
                 key={transaction.id}
                 className="bg-gray-700/50 rounded-lg p-4 border border-gray-600"
@@ -436,9 +446,9 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
           {/* Results Summary */}
           <div className="mt-4 flex flex-col sm:flex-row items-center justify-between text-sm text-gray-400 space-y-2 sm:space-y-0">
             <span>
-              Showing {sortedTransactions.length} of {pagination.total} transactions
+              Showing {transactions.length} of {pagination.total} transactions
             </span>
-            {sortedTransactions.length === 0 && (
+            {transactions.length === 0 && (
               <span className="text-yellow-500">No transactions match your current filters</span>
             )}
           </div>

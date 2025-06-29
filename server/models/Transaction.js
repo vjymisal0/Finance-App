@@ -30,12 +30,33 @@ export class Transaction {
     return await collection.find(query, options).toArray();
   }
 
+  static async findWithSort(query = {}, sortObject = { date: -1 }) {
+    const collection = Transaction.getCollection();
+    return await collection
+      .find(query)
+      .sort(sortObject)
+      .toArray();
+  }
+
   static async findWithPagination(query = {}, page = 1, limit = 10) {
     const collection = Transaction.getCollection();
     const total = await collection.countDocuments(query);
     const transactions = await collection
       .find(query)
       .sort({ date: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .toArray();
+
+    return { transactions, total };
+  }
+
+  static async findWithPaginationAndSort(query = {}, page = 1, limit = 10, sortObject = { date: -1 }) {
+    const collection = Transaction.getCollection();
+    const total = await collection.countDocuments(query);
+    const transactions = await collection
+      .find(query)
+      .sort(sortObject)
       .skip((page - 1) * limit)
       .limit(limit)
       .toArray();

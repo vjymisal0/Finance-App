@@ -9,7 +9,9 @@ export const getTransactions = async (req, res) => {
       status = 'all',
       type = 'all',
       category = 'all',
-      dateRange = 'all'
+      dateRange = 'all',
+      sortField = 'date',
+      sortDirection = 'desc'
     } = req.query;
 
     // Build query
@@ -56,11 +58,32 @@ export const getTransactions = async (req, res) => {
       }
     }
 
-    // Get paginated results
-    const { transactions, total } = await Transaction.findWithPagination(
+    // Build sort object
+    let sortObject = {};
+
+    switch (sortField) {
+      case 'name':
+        sortObject.user_name = sortDirection === 'asc' ? 1 : -1;
+        break;
+      case 'date':
+        sortObject.date = sortDirection === 'asc' ? 1 : -1;
+        break;
+      case 'amount':
+        sortObject.amount = sortDirection === 'asc' ? 1 : -1;
+        break;
+      case 'status':
+        sortObject.status = sortDirection === 'asc' ? 1 : -1;
+        break;
+      default:
+        sortObject.date = -1; // Default sort by date descending
+    }
+
+    // Get paginated results with server-side sorting
+    const { transactions, total } = await Transaction.findWithPaginationAndSort(
       query,
       parseInt(page),
-      parseInt(limit)
+      parseInt(limit),
+      sortObject
     );
 
     // Transform data to match frontend expectations
@@ -74,6 +97,10 @@ export const getTransactions = async (req, res) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total: total
+      },
+      sorting: {
+        field: sortField,
+        direction: sortDirection
       }
     });
 
@@ -88,7 +115,7 @@ export const getTransactions = async (req, res) => {
 
 export const exportTransactions = async (req, res) => {
   try {
-    const { columns, dateRange, filters, format } = req.body;
+    const { columns, dateRange, filters, format, sortField, sortDirection } = req.body;
 
     // Build query based on filters
     let query = {};
@@ -109,7 +136,31 @@ export const exportTransactions = async (req, res) => {
       };
     }
 
-    const transactions = await Transaction.find(query);
+    // Build sort object for export
+    let sortObject = {};
+    if (sortField && sortDirection) {
+      switch (sortField) {
+        case 'name':
+          sortObject.user_name = sortDirection === 'asc' ? 1 : -1;
+          break;
+        case 'date':
+          sortObject.date = sortDirection === 'asc' ? 1 : -1;
+          break;
+        case 'amount':
+          sortObject.amount = sortDirection === 'asc' ? 1 : -1;
+          break;
+        case 'status':
+          sortObject.status = sortDirection === 'asc' ? 1 : -1;
+          break;
+        default:
+          sortObject.date = -1;
+      }
+    } else {
+      sortObject.date = -1; // Default sort
+    }
+
+    // Get sorted transactions for export
+    const transactions = await Transaction.findWithSort(query, sortObject);
 
     // Transform data for export with actual user names from database
     const exportData = transactions.map(transaction => {
