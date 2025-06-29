@@ -168,7 +168,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                 ...filters,
                 dateRange: e.target.value as FilterOptions['dateRange']
               })}
-              className="bg-transparent text-white text-sm focus:outline-none"
+              className="bg-gray-700 text-white text-sm focus:outline-none"
             >
               <option value="all">All Time</option>
               <option value="7days">Last 7 Days</option>
