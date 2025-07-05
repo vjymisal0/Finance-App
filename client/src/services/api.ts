@@ -292,6 +292,32 @@ class ApiService {
     }
   }
 
+
+
+  async getChartData(period: string = 'monthly', months: number = 12): Promise<ApiResponse<any[]>> {
+    try {
+      const params = new URLSearchParams({
+        period,
+        months: months.toString()
+      });
+
+      const response = await this.api.get(`/charts/data?${params.toString()}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch chart data');
+    }
+  }
+
+  async getChartSummary(period: string = 'current_month'): Promise<ApiResponse<any>> {
+    try {
+      const response = await this.api.get(`/charts/summary?period=${period}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch chart summary');
+    }
+  }
+
+
   // Dashboard data
   async getDashboardData(): Promise<ApiResponse<{
     metrics: any[];

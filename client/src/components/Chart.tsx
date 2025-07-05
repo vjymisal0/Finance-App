@@ -1,212 +1,219 @@
-import React, { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Area, AreaChart } from 'recharts';
+import React, { useState, useEffect } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
 import { ChartData } from '../types';
-import { TrendingUp, BarChart3, Activity, Calendar } from 'lucide-react';
+import { apiService } from '../services/api';
 
 interface ChartProps {
-  data: ChartData[];
+  data?: ChartData[];
 }
 
-const Chart: React.FC<ChartProps> = ({ data }) => {
-  const [chartType, setChartType] = useState<'line' | 'area'>('area');
-  const [timeRange, setTimeRange] = useState('monthly');
+const Chart: React.FC<ChartProps> = ({ data: propData }) => {
+  const [chartData, setChartData] = useState<ChartData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState('monthly');
+  const [chartSummary, setChartSummary] = useState<any>(null);
+
+  // Fetch chart data from API
+  useEffect(() => {
+    const fetchChartData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Determine months based on period
+        const months = selectedPeriod === 'yearly' ? 5 : selectedPeriod === 'weekly' ? 3 : 12;
+
+        const [chartResponse, summaryResponse] = await Promise.all([
+          apiService.getChartData(selectedPeriod, months),
+          apiService.getChartSummary('current_month')
+        ]);
+
+        setChartData(chartResponse.data);
+        setChartSummary(summaryResponse.data);
+      } catch (error: any) {
+        console.error('Failed to fetch chart data:', error);
+        setError(error.message || 'Failed to load chart data');
+
+        // Fallback to prop data or default data
+        if (propData) {
+          setChartData(propData);
+        } else {
+          setChartData(getDefaultChartData());
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChartData();
+  }, [selectedPeriod, propData]);
+
+  const getDefaultChartData = (): ChartData[] => {
+    return [
+      { month: 'Jan', income: 0, expenses: 0 },
+      { month: 'Feb', income: 0, expenses: 0 },
+      { month: 'Mar', income: 0, expenses: 0 },
+      { month: 'Apr', income: 0, expenses: 0 },
+      { month: 'May', income: 0, expenses: 0 },
+      { month: 'Jun', income: 0, expenses: 0 },
+    ];
+  };
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="glass rounded-xl p-4 shadow-xl border border-gray-700/50">
-          <p className="text-gray-300 text-sm font-medium mb-2">{label}</p>
+        <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 shadow-lg">
+          <p className="text-gray-300 text-sm mb-2">{label}</p>
           {payload.map((entry: any, index: number) => (
-            <div key={index} className="flex items-center justify-between space-x-4">
-              <div className="flex items-center space-x-2">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: entry.color }}
-                />
-                <span className="text-gray-300 text-sm">{entry.name}</span>
-              </div>
-              <span className="text-white font-semibold">
-                ${entry.value.toLocaleString()}
-              </span>
-            </div>
+            <p key={index} className="text-white font-semibold" style={{ color: entry.color }}>
+              {entry.name}: ${entry.value.toLocaleString()}
+            </p>
           ))}
+          {payload.length >= 2 && (
+            <p className="text-blue-400 font-semibold border-t border-gray-600 pt-2 mt-2">
+              Net: ${(payload[0].value - payload[1].value).toLocaleString()}
+            </p>
+          )}
         </div>
       );
     }
     return null;
   };
 
-  const chartOptions = [
-    { id: 'area', label: 'Area', icon: Activity },
-    { id: 'line', label: 'Line', icon: TrendingUp },
-  ];
+  const handlePeriodChange = (period: string) => {
+    setSelectedPeriod(period);
+  };
 
-  const timeRanges = [
-    { id: 'weekly', label: 'Weekly' },
-    { id: 'monthly', label: 'Monthly' },
-    { id: 'yearly', label: 'Yearly' },
-  ];
+  if (loading) {
+    return (
+      <div className="bg-gray-800 rounded-xl p-4">
+        <div className="flex items-center justify-center h-72">
+          <div className="text-center">
+            <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-400">Loading chart data...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="card-enhanced card-hover">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between p-6 border-b border-gray-700/50">
-        <div className="mb-4 sm:mb-0">
-          <h3 className="text-xl font-bold text-white mb-1">Financial Overview</h3>
-          <p className="text-gray-400 text-sm">Track your income and expenses over time</p>
-        </div>
+    <div className="bg-gray-800 rounded-xl p-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl font-bold text-white">Financial Overview</h3>
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
-          {/* Chart type selector */}
-          <div className="flex items-center space-x-2 bg-gray-700/50 rounded-lg p-1">
-            {chartOptions.map((option) => {
-              const Icon = option.icon;
-              return (
-                <button
-                  key={option.id}
-                  onClick={() => setChartType(option.id as 'line' | 'area')}
-                  className={`
-                    flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200
-                    ${chartType === option.id
-                      ? 'bg-green-500 text-white shadow-glow'
-                      : 'text-gray-400 hover:text-white hover:bg-gray-600/50'
-                    }
-                  `}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span className="hidden sm:inline">{option.label}</span>
-                </button>
-              );
-            })}
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+              <span className="text-gray-400 text-sm">Income</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-orange-500 rounded-full mr-2"></div>
+              <span className="text-gray-400 text-sm">Expenses</span>
+            </div>
           </div>
 
-          {/* Time range selector */}
-          <div className="flex items-center space-x-2">
-            <Calendar className="w-4 h-4 text-gray-400" />
-            <select
-              value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value)}
-              className="bg-gray-700/50 text-white px-3 py-2 rounded-lg text-sm border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500"
-            >
-              {timeRanges.map((range) => (
-                <option key={range.id} value={range.id}>
-                  {range.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <select
+            value={selectedPeriod}
+            onChange={(e) => handlePeriodChange(e.target.value)}
+            className="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+          >
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+          </select>
         </div>
       </div>
 
-      {/* Chart */}
-      <div className="p-6">
-        <div className="h-80 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            {chartType === 'area' ? (
-              <AreaChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                <defs>
-                  <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
-                <XAxis
-                  dataKey="month"
-                  stroke="#9CA3AF"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  stroke="#9CA3AF"
-                  fontSize={12}
-                  tickFormatter={(value) => `$${value}`}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Area
-                  type="monotone"
-                  dataKey="income"
-                  stroke="#10B981"
-                  strokeWidth={3}
-                  fill="url(#incomeGradient)"
-                  name="Income"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="expenses"
-                  stroke="#F59E0B"
-                  strokeWidth={3}
-                  fill="url(#expenseGradient)"
-                  name="Expenses"
-                />
-              </AreaChart>
-            ) : (
-              <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
-                <XAxis
-                  dataKey="month"
-                  stroke="#9CA3AF"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  stroke="#9CA3AF"
-                  fontSize={12}
-                  tickFormatter={(value) => `$${value}`}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Line
-                  type="monotone"
-                  dataKey="income"
-                  stroke="#10B981"
-                  strokeWidth={3}
-                  dot={{ fill: '#10B981', strokeWidth: 2, r: 5 }}
-                  activeDot={{ r: 7, stroke: '#10B981', strokeWidth: 2, fill: '#10B981' }}
-                  name="Income"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="expenses"
-                  stroke="#F59E0B"
-                  strokeWidth={3}
-                  dot={{ fill: '#F59E0B', strokeWidth: 2, r: 5 }}
-                  activeDot={{ r: 7, stroke: '#F59E0B', strokeWidth: 2, fill: '#F59E0B' }}
-                  name="Expenses"
-                />
-              </LineChart>
+      {error && (
+        <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
+          <p className="text-red-500 text-sm">{error}</p>
+          <p className="text-gray-400 text-xs mt-1">Showing fallback data</p>
+        </div>
+      )}
+
+      <div className="h-72">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <XAxis
+              dataKey="month"
+              stroke="#9CA3AF"
+              fontSize={12}
+            />
+            <YAxis
+              stroke="#9CA3AF"
+              fontSize={12}
+              tickFormatter={(value) => `$${value.toLocaleString()}`}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Line
+              type="monotone"
+              dataKey="income"
+              stroke="#10B981"
+              strokeWidth={3}
+              dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+              activeDot={{ r: 6, stroke: '#10B981', strokeWidth: 2 }}
+              name="Income"
+            />
+            <Line
+              type="monotone"
+              dataKey="expenses"
+              stroke="#F59E0B"
+              strokeWidth={3}
+              dot={{ fill: '#F59E0B', strokeWidth: 2, r: 4 }}
+              activeDot={{ r: 6, stroke: '#F59E0B', strokeWidth: 2 }}
+              name="Expenses"
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Chart Summary */}
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-3 bg-gray-700 rounded-lg">
+          <div className="text-green-500 text-lg font-bold">
+            ${chartSummary?.totalIncome?.toLocaleString() || '0'}
+          </div>
+          <div className="text-gray-400 text-xs">Total Income</div>
+        </div>
+
+        <div className="p-3 bg-gray-700 rounded-lg">
+          <div className="text-orange-500 text-lg font-bold">
+            ${chartSummary?.totalExpenses?.toLocaleString() || '0'}
+          </div>
+          <div className="text-gray-400 text-xs">Total Expenses</div>
+        </div>
+
+        <div className="p-3 bg-gray-700 rounded-lg">
+          <div className={`text-lg font-bold ${(chartSummary?.netIncome || 0) >= 0 ? 'text-green-500' : 'text-red-500'
+            }`}>
+            ${chartSummary?.netIncome?.toLocaleString() || '0'}
+          </div>
+          <div className="text-gray-400 text-xs">Net Income</div>
+        </div>
+      </div>
+
+      {/* Additional Insights */}
+      {chartSummary && (
+        <div className="mt-4 p-3 bg-gray-700 rounded-lg">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-400">
+              {chartSummary.transactionCount} transactions this month
+            </span>
+            {chartSummary.topCategory && (
+              <span className="text-gray-400">
+                Top category: <span className="text-white">{chartSummary.topCategory.name}</span>
+              </span>
             )}
-          </ResponsiveContainer>
-        </div>
-
-        {/* Summary */}
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="glass-light rounded-xl p-4 text-center">
-            <div className="text-green-400 text-2xl font-bold">$24,500</div>
-            <div className="text-gray-400 text-sm">Total Income</div>
-            <div className="text-green-400 text-xs mt-1">+12.5% from last month</div>
-          </div>
-          <div className="glass-light rounded-xl p-4 text-center">
-            <div className="text-orange-400 text-2xl font-bold">$18,200</div>
-            <div className="text-gray-400 text-sm">Total Expenses</div>
-            <div className="text-red-400 text-xs mt-1">+3.2% from last month</div>
-          </div>
-          <div className="glass-light rounded-xl p-4 text-center">
-            <div className="text-blue-400 text-2xl font-bold">$6,300</div>
-            <div className="text-gray-400 text-sm">Net Profit</div>
-            <div className="text-green-400 text-xs mt-1">+25.7% from last month</div>
+            <span className="text-gray-400">
+              Avg: ${chartSummary.avgTransactionAmount?.toLocaleString() || '0'}
+            </span>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

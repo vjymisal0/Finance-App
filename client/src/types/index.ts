@@ -24,6 +24,8 @@ export interface ChartData {
   month: string;
   income: number;
   expenses: number;
+  netIncome?: number;
+  transactionCount?: number;
 }
 
 export interface FilterOptions {
@@ -93,4 +95,17 @@ export interface ApiResponse<T> {
   message: string;
   success: boolean;
   pagination?: PaginationOptions;
+}
+
+export interface ChartSummary {
+  totalIncome: number;
+  totalExpenses: number;
+  netIncome: number;
+  transactionCount: number;
+  avgTransactionAmount: number;
+  topCategory: {
+    name: string;
+    amount: number;
+  } | null;
+  growthRate: number;
 }

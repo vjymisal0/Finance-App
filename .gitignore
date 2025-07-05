@@ -2,3 +2,7 @@ node_modules/
 .env
 
 \postmancollections.md
+
+TECHNICAL_DOCUMENTATION.md
+QNA.md
+client/client.md
